@@ -1,6 +1,7 @@
 from database import db
-from datetime import datetime
-import json
+from models.constants import CLOSED_TASK_STATUSES, DEFAULT_PRIORITY, TASK_STATUS_PENDING
+from utils.helpers import format_datetime, utcnow
+
 
 class Task(db.Model):
     __tablename__ = 'tasks'
@@ -8,53 +9,48 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(50), default='pending')
-    priority = db.Column(db.Integer, default=3)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    status = db.Column(db.String(50), default=TASK_STATUS_PENDING)
+    priority = db.Column(db.Integer, default=DEFAULT_PRIORITY)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id', ondelete='SET NULL'), nullable=True)
+    created_at = db.Column(db.DateTime, default=utcnow)
+    updated_at = db.Column(db.DateTime, default=utcnow, onupdate=utcnow)
     due_date = db.Column(db.DateTime, nullable=True)
     tags = db.Column(db.String(500), nullable=True)
 
-    user = db.relationship('User', backref='tasks')
+    # Deletar um usuário apaga as tasks dele; deletar uma categoria deixa category_id nulo.
+    user = db.relationship('User', backref=db.backref('tasks', cascade='all, delete'))
     category = db.relationship('Category', backref='tasks')
 
     def to_dict(self):
-        data = {}
-        data['id'] = self.id
-        data['title'] = self.title
-        data['description'] = self.description
-        data['status'] = self.status
-        data['priority'] = self.priority
-        data['user_id'] = self.user_id
-        data['category_id'] = self.category_id
-        data['created_at'] = str(self.created_at)
-        data['updated_at'] = str(self.updated_at)
-        data['due_date'] = str(self.due_date) if self.due_date else None
-        data['tags'] = self.tags.split(',') if self.tags else []
-        return data
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'status': self.status,
+            'priority': self.priority,
+            'user_id': self.user_id,
+            'category_id': self.category_id,
+            'created_at': str(self.created_at),
+            'updated_at': str(self.updated_at),
+            'due_date': format_datetime(self.due_date),
+            'tags': self.tags.split(',') if self.tags else [],
+        }
 
-    def validate_status(self, new_status):
-        valid = ['pending', 'in_progress', 'done', 'cancelled']
-        if new_status in valid:
-            return True
-        else:
+    def to_summary_dict(self):
+        """Formato reduzido usado por GET /users/<id>/tasks."""
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'status': self.status,
+            'priority': self.priority,
+            'created_at': str(self.created_at),
+            'due_date': format_datetime(self.due_date),
+            'overdue': self.is_overdue(),
+        }
+
+    def is_overdue(self, now=None):
+        if not self.due_date or self.status in CLOSED_TASK_STATUSES:
             return False
-
-    def validate_priority(self, p):
-        if p >= 1 and p <= 5:
-            return True
-        return False
-
-    def is_overdue(self):
-        if self.due_date:
-            if self.due_date < datetime.utcnow():
-                if self.status != 'done' and self.status != 'cancelled':
-                    return True
-                else:
-                    return False
-            else:
-                return False
-        else:
-            return False
+        return self.due_date < (now or utcnow())

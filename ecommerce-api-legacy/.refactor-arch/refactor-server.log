@@ -1,0 +1,9 @@
+npm notice run desafio-arquitetura-ia-boilerplate@1.0.0 start
+npm notice run node src/app.js
+{"level":"info","msg":"LMS API rodando em http://127.0.0.1:3101","ts":"2026-11-14T14:46:58.181Z"}
+{"level":"info","msg":"Processando pagamento","cardLast4":"4444","amount":997,"gatewayConfigured":false,"ts":"2026-11-14T14:47:10.558Z"}
+{"level":"info","msg":"Processando pagamento","cardLast4":"4444","amount":497,"gatewayConfigured":false,"ts":"2026-11-14T14:47:10.572Z"}
+{"level":"info","msg":"Checkout concluído","userId":2,"courseId":2,"enrollmentId":2,"ts":"2026-11-14T14:47:10.594Z"}
+{"level":"info","msg":"Processando pagamento","cardLast4":"0000","amount":497,"gatewayConfigured":false,"ts":"2026-11-14T14:47:10.608Z"}
+{"level":"info","msg":"Checkout concluído","userId":1,"courseId":2,"enrollmentId":3,"ts":"2026-11-14T14:47:10.608Z"}
+{"level":"info","msg":"Encerrando","signal":"SIGTERM","ts":"2026-11-14T14:47:32.076Z"}

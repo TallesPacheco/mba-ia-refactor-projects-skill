@@ -1,0 +1,286 @@
+# Log real do Claude Code CLI — task-manager-api
+# Comando: cd <copia-do-original>/task-manager-api && claude -p "/refactor-arch" (código ORIGINAL do commit inicial; pausa no gate da Fase 2)
+# Formato: textos do assistente + chamadas de ferramenta resumidas, extraídos do stream-json
+
+I'll start Phase 1 of the architectural audit.
+  [tool] Skill: 
+  [tool] ToolSearch: 
+  [tool] Bash: List project root
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] TodoWrite: 
+  [tool] Bash: Inventory source files and line counts
+First run, no prior `.refactor-arch`. Reading all 15 source files.
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Bash: Read init files and check python version
+Read all 15 files. Now setting up isolated env and consulting advisor in parallel.
+  [tool] Bash: Create venv and install deps
+  [tool] Bash: Verify installed versions and list Flask routes
+  [tool] TodoWrite: 
+  [tool] Bash: Run seed and locate SQLite DB file
+  [tool] Bash: Locate DB file and list tables
+DB lands in `instance/tasks.db`. Booting baseline server (debug on, no reloader, to match `python app.py`).
+  [tool] Bash: Start baseline server in background
+  [tool] Bash: Baseline GET requests part 1
+  [tool] Bash: Baseline GET requests part 2
+  [tool] Bash: Baseline POST requests
+  [tool] Bash: Baseline PUTs and error edge cases
+  [tool] Bash: Baseline error statuses and DELETEs
+  [tool] Bash: Test FK orphan behavior and check log warnings
+  [tool] Bash: Stop baseline server and confirm port free
+  [tool] Write: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Bash: Check unused deps and orphan modules
+  [tool] Write: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+```
+================================
+PHASE 1: PROJECT ANALYSIS
+================================
+Language:      Python 3.14.3
+Framework:     Flask 3.0.0 (Werkzeug 3.1.9)
+Dependencies:  flask-sqlalchemy 3.1.1, SQLAlchemy 2.1.8 (transitivo), flask-cors 4.0.0, marshmallow 3.20.1 (não usada), requests 2.31.0 (não usada), python-dotenv 1.0.0 (não usada)
+Domain:        Task Manager API (tasks, users, categories, reports)
+Architecture:  Camadas parciais — models/routes/services/utils existem, mas regra de negócio e queries vivem nos handlers; sem config, sem controllers, sem app factory, sem error handler; services/notification_service.py nunca é importado
+Source files:  15 files analyzed
+DB tables:     users, categories, tasks (SQLite via Flask-SQLAlchemy, instance/tasks.db)
+================================
+```
+
+**Entry point:** `app.py` — `app` em nível de módulo, `db.create_all()` no import (`app.py:30-31`), start original `python app.py` com `debug=True, host='0.0.0.0', port=5000` hardcoded (`app.py:34`). Seed: `python seed.py`.
+**Rotas:** 22 da aplicação (`app.py` 2, `task_routes.py` 7, `user_routes.py` 7, `report_routes.py` 6); `flask --app app routes` lista 23 — a extra é `/static/<path:filename>`.
+**Baseline:** `.refactor-arch/baseline.md` — 43 requisições, porta 5001, servidor encerrado e porta livre.
+
+Phase 2 now: reading the anti-patterns catalog.
+  [tool] TodoWrite: 
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+Catalog read. Running all AP detection greps with exact line numbers.
+  [tool] Bash: AP-01..AP-07 detection greps
+  [tool] Bash: AP-01..AP-07 greps via proxy
+  [tool] Bash: AP-06..AP-12 greps
+  [tool] Bash: AP-13..AP-22 greps
+  [tool] Bash: AP-17, AP-24, AP-25, AP-26 greps
+  [tool] Bash: Run pyflakes for dead imports
+  [tool] Bash: Check unused methods and duplication
+  [tool] Bash: Verify God file metrics and coupling counts
+  [tool] Bash: Verify AP-20 and AP-21 exact lines
+All lines verified. Writing the audit report.
+  [tool] Write: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Bash: Verify report counts and git cleanliness
+Report written and verified (24 findings, counts match). Consulting advisor before presenting.
+  [tool] Bash: Get exact line numbers for AP-09 and AP-17
+Now applying the three corrections.
+  [tool] Edit: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Edit: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Edit: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Edit: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Edit: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Bash: Verify corrected report ordering and counts
+Counts and ordering verified: 8/4/7/5 = 24.
+
+```
+================================
+ARCHITECTURE AUDIT REPORT
+================================
+Project: task-manager-api
+Stack:   Python 3.14.3 + Flask 3.0.0 (Flask-SQLAlchemy 3.1.1 / SQLAlchemy 2.1.8)
+Files:   15 analyzed | ~1158 lines of code
+
+## Summary
+CRITICAL: 8 | HIGH: 4 | MEDIUM: 7 | LOW: 5
+```
+
+## Findings
+
+### [CRITICAL] Credenciais / segredos hardcoded (AP-01)
+**File:** `app.py:11, 13` · `services/notification_service.py:7, 8, 9, 10` · `seed.py:19, 26, 33`
+**Description:** `SECRET_KEY = 'super-secret-key-123'` e a URI do banco são literais no entry point. `notification_service.py` embute credenciais SMTP completas (`email_user = 'taskmanager@gmail.com'`, `email_password = 'senha123'`), usadas em `server.login(...)` (`:17`). O seed grava senhas literais: `'1234'`, `'abcd'`, `'pass'`. `python-dotenv` está declarado e nunca é importado.
+**Impact:** quem lê o repositório obtém a chave de sessão, a credencial de e-mail e as senhas das 3 contas de seed — incluindo a de `role: admin` (baseline: `POST /login` com `joao@email.com`/`1234` → 200).
+**Recommendation:** config por ambiente em `config/settings.py`, sem fallback literal; `.env.example`; senhas de seed do ambiente ou geradas com `secrets` (PB-01, PB-25)
+
+### [CRITICAL] God File — rotas concentrando ORM, regra de negócio e serialização (AP-03)
+**File:** `routes/task_routes.py:1-299` · `routes/report_routes.py:12-101, 157-223`
+**Description:** `task_routes.py` tem 299 linhas e mistura 4 responsabilidades: 7 rotas, 25 acessos a ORM/sessão, 44 linhas de serialização manual, 16 trechos de regra de negócio. `report_routes.py` acumula dois domínios sem relação: relatórios e o CRUD completo de `/categories` (`:157-223`). Não existe camada de controllers.
+**Impact:** nenhuma regra é testável sem subir Flask e banco; a lógica reescrita em cada arquivo já divergiu (3 shapes de task na mesma API); mudar o cálculo de atraso exige editar 6 lugares.
+**Recommendation:** controllers finos + services por recurso; separar o CRUD de categorias do módulo de relatórios, preservando paths e métodos (PB-03, PB-04)
+
+### [CRITICAL] Exposição de dados sensíveis — hash de senha na resposta (AP-04)
+**File:** `models/user.py:21` · `routes/user_routes.py:33, 85-86, 129, 209`
+**Description:** `User.to_dict()` inclui `'password': self.password`, devolvido em `GET /users/<id>`, `POST /users`, `PUT /users/<id>` e `POST /login`.
+**Impact:** confirmado em runtime — `GET /users/1` → 200 com `"password": "81dc9bdb52d04dc20036dbd8313ed055"` (md5 de `1234`). Combinado com a ausência de auth, qualquer anônimo coleta os hashes de todos os usuários.
+**Recommendation:** remover `password` de `to_dict()`; se preciso, método interno separado não exposto por rota (PB-06)
+
+### [CRITICAL] Hash de senha fraco (md5 sem salt) (AP-05)
+**File:** `models/user.py:29, 32`
+**Description:** `hashlib.md5(pwd.encode()).hexdigest()`, sem salt, sem fator de custo, comparação de string não constante no tempo. Nenhuma lib de hash em uso, embora `werkzeug` já esteja instalado.
+**Impact:** o hash do baseline é o md5 público de `1234`. Senhas iguais geram hashes iguais. O mínimo é 4 caracteres (`user_routes.py:64`).
+**Recommendation:** `werkzeug.security.generate_password_hash`/`check_password_hash`, mantendo coluna e assinatura dos métodos; documentar migração dos hashes md5 (PB-05)
+
+### [CRITICAL] Endpoints destrutivos e de escalonamento de privilégio sem auth (AP-06)
+**File:** `routes/user_routes.py:92, 119-122, 134` · `routes/task_routes.py:225` · `routes/report_routes.py:211`
+**Description:** nenhuma rota tem auth — o grep de `login_required|jwt_required|require_auth|before_request|role_required` só encontra a definição de `is_admin` (`models/user.py:34`), nunca chamada. Anônimos: `DELETE /users/<id>` (apaga o usuário e suas tasks), `PUT /users/<id>` (aceita `role` do corpo → promove a `admin`), `DELETE /tasks/<id>`, `DELETE /categories/<id>`.
+**Impact:** confirmado — `DELETE /users/4` sem cabeçalho nenhum → 200, tasks removidas. Qualquer cliente apaga a base ou se promove a admin com um `PUT`.
+**Recommendation:** manter paths e métodos, exigindo credencial: `require_auth` nas escritas, `require_admin` nas destrutivas e na troca de `role` (PB-07)
+
+### [CRITICAL] Debug ligado, bind em 0.0.0.0 e porta fixa (AP-07)
+**File:** `app.py:34`
+**Description:** `app.run(debug=True, host='0.0.0.0', port=5000)`.
+**Impact:** o console do Werkzeug fica exposto em todas as interfaces. Confirmado: `GET /tasks/search?priority=abc` → 500 `text/html` com a página do Debugger, stack trace e caminho absoluto dos arquivos.
+**Recommendation:** `debug`/`host`/`port` da config, `debug=False` por padrão, mantendo `python app.py` funcionando via env (PB-01, PB-16)
+
+### [CRITICAL] Token de login previsível e nunca verificado (AP-24)
+**File:** `routes/user_routes.py:210`
+**Description:** `'token': 'fake-jwt-token-' + str(user.id)` — sem assinatura, sem expiração, sem segredo. Nenhuma rota lê o token (grep de `verify_token|jwt.decode|serializer.loads|headers.get('Authorization')` vazio).
+**Impact:** confirmado — dois logins seguidos devolveram `fake-jwt-token-1` idêntico, e o valor é adivinhável para qualquer id. Nada protege hoje; uma verificação ingênua sobre esse formato daria personificação trivial do admin id 1.
+**Recommendation:** token assinado (`itsdangerous` com o `SECRET_KEY` da config ou JWT) com expiração + `require_auth` lendo `Authorization: Bearer`; manter a chave `token` como string (PB-21)
+
+### [CRITICAL] PII listada e detalhada sem autenticação (AP-25)
+**File:** `routes/user_routes.py:10-25, 27-40` · `routes/report_routes.py:103-107, 137-142`
+**Description:** `GET /users` devolve nome, e-mail e papel de todos anonimamente; `GET /users/<id>` devolve o registro completo + tasks; `GET /reports/user/<id>` devolve nome e e-mail (`:141`). Nenhuma tem guard.
+**Impact:** confirmado — `curl` anônimo em `GET /users` → 200 com os 3 e-mails e papéis, identificando quem é admin. **Elevado de HIGH para CRITICAL pela regra do próprio AP-25** (resposta inclui credencial/hash): `GET /users/<id>` anônimo também devolve o hash da senha, registrado em AP-04.
+**Recommendation:** `require_auth` nas três; `GET /users` restrito a admin, `GET /users/<id>` ao próprio usuário ou admin (PB-22 + PB-21)
+
+### [HIGH] Regra de negócio nas rotas; camada de services órfã (AP-08)
+**File:** `routes/task_routes.py:12-63, 86-154, 157-223, 274-299` · `routes/report_routes.py:13-101, 104-155` · `routes/user_routes.py:43-90, 93-132, 154-183` · `services/notification_service.py:1-48` · `models/task.py:38-48, 50-60` · `utils/helpers.py:9-108`
+**Description:** `summary_report` tem 89 linhas com 20 queries; `create_task` 69; `get_tasks` 52. A camada que deveria conter isso está morta: `notification_service.py` não é importado por arquivo nenhum, e as 9 funções de `utils/helpers.py` nunca são chamadas (verificado uma a uma). Os models têm `validate_status`, `validate_priority` e `is_overdue` nunca usados enquanto as rotas reescrevem a mesma lógica.
+**Impact:** impossível testar regra de atraso, produtividade ou validação sem servidor + banco; `services/`/`utils/` dão falsa impressão de camadas que não existem na execução.
+**Recommendation:** services por domínio com a regra extraída; controllers só validam, chamam e serializam; adotar `Task.is_overdue()` e os helpers como fonte única, apagando o resto (PB-04)
+
+### [HIGH] Acoplamento ao estado global, sem injeção de dependência (AP-09)
+**File:** `routes/task_routes.py:14, 42, 51, 67, 117, 122, 147, 148, 152, 158, 188, 195` (+15) · `routes/user_routes.py:12, 29, 35, 67, 81, 82, 88, 94, 109, 128, 131, 136` (+8) · `routes/report_routes.py:15, 16, 17, 19, 30, 46, 53, 56, 105, 109, 159, 163` (+13) · `services/notification_service.py:6, 15`
+**Description:** handlers falam direto com o singleton `db.session` (25 usos) e com a Query API dos models (50 chamadas: 29 `Task.query.`, 14 `User.query.`, 7 `Category.query.`), sem repositório nem parâmetro injetado. `NotificationService` guarda estado mutável em memória (`:6`) e instancia o SMTP dentro do método (`:15`).
+**Impact:** nenhum handler aceita dobro de teste; trocar o banco obriga editar 75 pontos. `self.notifications` é perdida a cada boot e não é compartilhada entre workers.
+**Recommendation:** concentrar acesso a dados em repositórios/services recebendo a sessão; injetar o serviço de notificação no composition root (PB-17)
+
+### [HIGH] Escritas multi-etapa sem transação única (AP-10)
+**File:** `seed.py:11-14, 37, 63, 92` · `routes/user_routes.py:140-146`
+**Description:** `seed_data()` apaga as 3 tabelas e faz **4 commits independentes**, sem bloco transacional. Em `delete_user`, as tasks são marcadas para exclusão **antes** do `try` (`:141-142`).
+**Impact:** falha entre commits deixa estado parcial irreversível — dados antigos já apagados pelo commit da linha 14 e tabelas novas incompletas, sem rollback possível. Risco real na validação da Fase 3, que depende do seed.
+**Recommendation:** `with db.session.begin():` cobrindo todo o seed, um commit no fim; mover a exclusão das tasks para dentro do bloco transacional (PB-09)
+
+### [HIGH] Sem config nem app factory; efeitos colaterais no import (AP-11)
+**File:** `app.py:9, 11-13, 15-16, 30-31` · `seed.py:2`
+**Description:** `app` criado em nível de módulo, config inline, e `with app.app_context(): db.create_all()` **no import**. Não existe `create_app()` nem `config.py`. `seed.py:2` importa `app`, então importar o seed também cria o schema.
+**Impact:** qualquer import de `app` cria o banco como efeito colateral — `instance/tasks.db` nasceu só de rodar `python seed.py`. Impossível instanciar o app com outra config sem editar código.
+**Recommendation:** `config/settings.py` por ambiente + `create_app()` como composition root; `db.create_all()` sob controle explícito, mantendo `app` em nível de módulo para `python app.py`, `flask --app app run` e o seed (PB-01, PB-16)
+
+### [MEDIUM] Erros engolidos, sem error handler central; 404/405/500 fora do formato da API (AP-12)
+**File:** `routes/task_routes.py:62, 137, 151, 204, 221, 236` · `routes/user_routes.py:87, 130, 149` · `routes/report_routes.py:186, 207, 221` · `utils/helpers.py:46, 49, 88` · `services/notification_service.py:23` · `app.py:1-34`
+**Description:** 16 blocos `except`, 11 deles nus, descartando a exceção. `task_routes.py:221` captura `Exception as e` e nunca usa `e` (pyflakes confirma). Não existe handler central (grep de `errorhandler(`/`register_error_handler(` vazio).
+**Impact:** confirmado — 4 requisições com **500 HTML do Werkzeug** em vez do JSON de erro da API, vazando tipo, mensagem e caminho dos arquivos. `GET /__rota-inexistente__` → `404 text/html`; `DELETE /tasks` → `405 text/html`; `PUT /categories/1` sem corpo → `400 text/html`. Clientes que esperam JSON quebram no parse.
+**Recommendation:** handlers centrais no app (não em blueprint) para `HTTPException`, exceções de domínio e `Exception`, sempre com a chave `error` já usada; `logger.exception` nos blocos (PB-08, PB-23)
+
+### [MEDIUM] Queries N+1 e agregação em memória (AP-13)
+**File:** `routes/task_routes.py:42, 51, 281-287` · `routes/report_routes.py:30-43, 53-68, 56, 159-164, 163` · `routes/user_routes.py:22`
+**Description:** `GET /tasks` faz 2 queries extras por task (`:42`, `:51`). `GET /categories` 1 `count()` por categoria. `/reports/summary` 1 query por usuário (`:56`) + 12 `COUNT` separados (`:19-28`) que poderiam ser dois `GROUP BY`. `GET /users` usa `len(u.tasks)` (lazy load por usuário).
+**Impact:** `GET /tasks` com 10 tasks já faz 21 queries; com 1.000 faria 2.001. Invisível no seed, explode em produção.
+**Recommendation:** `selectinload`/`joinedload` em `GET /tasks`; `GROUP BY status`/`priority`; agregação no banco para `task_count` e estatísticas (PB-10)
+
+### [MEDIUM] Validação de entrada ausente (AP-14)
+**File:** `routes/task_routes.py:104, 113, 182, 240-246, 249-255, 261, 264` · `routes/report_routes.py:196-202` · `routes/user_routes.py:103, 125`
+**Description:** `int(priority)`/`int(user_id)` sem checagem (`:261`, `:264`); `priority` do JSON comparado com números sem conversão (`:113`, `:182`); `update_category` sem o guard `if not data`. O termo `q` é interpolado em `LIKE` sem escapar `%`/`_` (`:252-253`) — a query **é** parametrizada pelo SQLAlchemy (não há SQL injection), mas o curinga do cliente passa direto. `marshmallow` declarado e nunca importado.
+**Impact:** confirmado — 4 × 500: `ValueError: invalid literal for int()` em `/tasks/search?priority=abc` e `?user_id=abc`; `TypeError: '<' not supported between instances of 'str' and 'int'` em `POST`/`PUT /tasks` com `"priority":"high"`. E `?q=%` devolveu **todas** as tasks.
+**Recommendation:** conversão com `try`/`except` → 400, coerção de tipo antes de comparar, guard de corpo em `update_category`, escape de `%`/`_`; schemas de entrada centralizados (PB-11)
+
+### [MEDIUM] Código duplicado (AP-15)
+**File:** `routes/task_routes.py:30-39, 71-80, 283-287, 110, 177, 296` · `routes/report_routes.py:34-43, 132-135, 67, 151` · `routes/user_routes.py:61, 106, 71, 120, 171-180` · `models/task.py:39, 50-60` · `utils/helpers.py:14-17, 21, 75, 110-111`
+**Description:** a regra de atraso está reescrita **6 vezes** enquanto `Task.is_overdue()` existe e nunca é chamado. Lista de status 5×, papéis 3×, regex de e-mail 3×, `completion_rate` 3× (com `calculate_percentage` pronta e não usada). Serialização de task tem 3 implementações divergentes.
+**Impact:** confirmado no baseline — a mesma entidade sai com 3 shapes: `/tasks` traz `overdue`+`user_name`+`category_name`, `/tasks/<id>` só `overdue`, `/tasks/search` nenhum, `/users/<id>/tasks` um subconjunto. Corrigir atraso exige 6 edições.
+**Recommendation:** `is_overdue()` como fonte única; usar as constantes e `calculate_percentage` existentes; manter os shapes atuais (contrato) construídos a partir de uma serialização base (PB-18)
+
+### [MEDIUM] Deprecated APIs (AP-17)
+**File:** `routes/task_routes.py:31, 72, 215, 285` · `routes/report_routes.py:35, 42, 45, 71, 133` · `routes/user_routes.py:172` · `models/task.py:52` · `utils/helpers.py:38` · `services/notification_service.py:35` · `seed.py:66, 67, 69, 70, 74` — `datetime.utcnow()` → `datetime.now(timezone.utc)`
+**File:** `models/task.py:15, 16` · `models/user.py:14` · `models/category.py:11` — `default=datetime.utcnow` nas colunas
+**File:** `routes/task_routes.py:42, 51, 67, 117, 122, 158, 188, 195, 227` · `routes/user_routes.py:29, 94, 136, 155` · `routes/report_routes.py:105, 192, 213` — `Model.query.get()` → `db.session.get(Model, id)`
+**File:** `routes/task_routes.py:141` · `utils/helpers.py:103` — `type(x) == list` → `isinstance`
+**Description:** 18 `datetime.utcnow()` (deprecated no Python 3.12), 16 `Model.query.get()` (legado no SQLAlchemy 2.x), 56 usos da Query API legada `Model.query.*`.
+**Impact:** confirmado — 85 linhas de warning no log do baseline, incluindo `DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal` e `LegacyAPIWarning: The Query.get() method is considered legacy`. Os datetimes naive também produzem a inconsistência de fuso do baseline: `created_at` em UTC e `/health` em hora local, 3h de diferença no mesmo instante.
+**Recommendation:** helper único de "agora em UTC", `db.session.get(...)`, `db.select(...)` ao reescrever nos services, `isinstance`. Atenção: comparações com colunas naive já gravadas e o formato `str(datetime)` são contrato — manter a string sem sufixo de fuso (PB-13)
+
+### [MEDIUM] CORS liberado para qualquer origem; sem camada de middlewares (AP-18)
+**File:** `app.py:15`
+**Description:** `CORS(app)` sem argumentos libera todas as origens, métodos e paths — incluindo `DELETE /users/<id>` e as rotas de PII. Não há nenhum middleware (auth, erro, logging).
+**Impact:** qualquer site pode chamar a API pelo navegador da vítima e ler as respostas, já que nenhuma rota exige credencial — o CORS aberto transforma a ausência de auth em superfície explorável da web.
+**Recommendation:** `CORS(app, origins=settings.CORS_ORIGINS)`; `middlewares/` com error handler e decorator de auth registrados na factory (PB-19)
+
+### [MEDIUM] Integridade referencial frágil e cascata manual (AP-19)
+**File:** `models/task.py:13, 14, 20, 21` · `routes/user_routes.py:140-142` · `routes/report_routes.py:211-223` · `models/category.py:8`
+**Description:** FKs sem `ondelete`, relacionamentos sem `cascade`/`passive_deletes`, SQLite sem `PRAGMA foreign_keys = ON`. `delete_user` compensa com cascata manual em loop na rota; `delete_category` não trata as tasks. `Category.name` sem `unique=True`.
+**Impact:** confirmado — criei categoria + task nela, chamei `DELETE /categories/<id>` → 200 `{"message":"Categoria deletada"}` e o `GET /tasks/<id>` seguinte devolveu `category_id: null`. A task perdeu a categoria silenciosamente. A cascata manual depende de a rota lembrar de fazê-la; o banco não valida a FK.
+**Recommendation:** declarar no schema (`ondelete='SET NULL'`/`'CASCADE'` + `passive_deletes=True`), `PRAGMA foreign_keys = ON`, remover a cascata manual, `unique=True` em `Category.name` — mantendo status e shapes (PB-20)
+
+### [LOW] Magic numbers / strings (AP-20)
+**File:** `routes/task_routes.py:96, 99, 104, 110, 113, 167, 169, 177, 182` · `routes/user_routes.py:64, 71, 115, 120` · `routes/report_routes.py:45, 129, 180` · `models/category.py:10` · `app.py:34` · `utils/helpers.py:110-116`
+**Description:** título 3/200, prioridade 1–5, default 3, senha mínima 4, janela de 7 dias, "alta prioridade" ≤2, cor `'#000000'`, porta 5000. As constantes correspondentes **já existem** em `utils/helpers.py:110-116` e nenhuma é usada.
+**Impact:** mudar o tamanho máximo de título exige 4 ocorrências em 2 arquivos mais a coluna `db.String(200)`; os valores já divergem entre a rota e o caminho morto de `utils/helpers.py:64`.
+**Recommendation:** usar as constantes já definidas em todos os pontos de validação; porta/host/debug para a config (PB-14)
+
+### [LOW] Nomenclatura ruim / variáveis de uma letra (AP-21)
+**File:** `seed.py:16, 23, 30, 39, 45, 51, 57, 78, 79` · `routes/report_routes.py:24, 25, 26, 27, 28, 33, 55, 59, 119, 161, 192, 213` · `routes/task_routes.py:16, 51, 122, 195, 268, 283` · `routes/user_routes.py:14, 37, 141, 161` · `models/user.py:27, 31` · `models/task.py:45` · `models/category.py:14`
+**Description:** `u1`–`u3`, `c1`–`c4`, `td`, `t`, `u`, `c`, `cat`, `pwd`, `p`, `d` em todo o código de negócio; `p1`–`p5` para as contagens por prioridade.
+**Impact:** `p1`–`p5` só se entende cruzando com o dict de saída (`critical`/`high`/`medium`/`low`/`minimal`, `:84-88`). Nenhum parâmetro sombreia builtin.
+**Recommendation:** renomear para nomes de domínio ao mover para os services; **não** renomear chaves de resposta nem parâmetros de query (contrato) (PB-18)
+
+### [LOW] `print` como logging (AP-22)
+**File:** `routes/task_routes.py:149, 153, 219, 234` · `routes/user_routes.py:83, 89, 147` · `services/notification_service.py:21, 24` · `utils/helpers.py:39, 41`
+**Description:** 11 `print()` como log da aplicação, inclusive para erros (`print(f"ERRO: {str(e)}")`). `utils/helpers.py:36-41` define um `log_action` baseado em `print` nunca chamado. Os `print` de `seed.py:93-96` são saída de CLI e não contam.
+**Impact:** falhas de escrita vão para stdout sem nível nem traceback (`str(e)` descarta a pilha); não há como filtrar por severidade ou correlacionar por requisição.
+**Recommendation:** `logging` na factory; `current_app.logger.*` e `logger.exception` nos blocos de erro; apagar `log_action` (PB-15)
+
+### [LOW] Imports não usados, código morto e dependências não usadas (AP-23)
+**File:** `app.py:7` · `routes/task_routes.py:7` · `routes/user_routes.py:6` · `routes/report_routes.py:7, 8` · `models/task.py:3` · `models/__init__.py:1-3` · `utils/helpers.py:3-7, 9-108` · `services/notification_service.py:1-48` · `models/user.py:34-38` · `models/task.py:38-48, 50-60` · `requirements.txt:4, 5, 6`
+**Description:** 16 imports não usados confirmados por `pyflakes`, mais `local variable 'e' is assigned to but never used` (`task_routes.py:221`). Todas as 9 funções públicas de `utils/helpers.py` só aparecem na própria definição; `notification_service.py` não é referenciado por nenhum arquivo; `is_admin`, `validate_status`, `validate_priority`, `is_overdue` nunca chamados; `marshmallow`, `requests` e `python-dotenv` nunca importados.
+**Impact:** `utils/helpers.py` (116 linhas) e `notification_service.py` (48) são 14% do código e não executam nada, mas sugerem uma camada de validação e um serviço de notificação funcionando. O módulo morto é justamente o que carrega a senha SMTP literal (AP-01).
+**Recommendation:** remover imports mortos; promover a fonte única o que for aproveitado e apagar o resto; remover as 3 dependências ou passar a usá-las (`python-dotenv` é o caminho natural do PB-01) (PB-18)
+
+### [LOW] Mensagens de resposta que não descrevem o efeito real (AP-26)
+**File:** `routes/user_routes.py:148` · `routes/report_routes.py:220` · `routes/task_routes.py:62`
+**Description:** `DELETE /users/<id>` diz "Usuário deletado com sucesso" sem mencionar que todas as tasks dele foram apagadas; `DELETE /categories/<id>` diz "Categoria deletada" sem mencionar que as tasks tiveram `category_id` anulado; `GET /tasks` devolve "Erro interno" para qualquer exceção.
+**Impact:** confirmado — após `DELETE /users/4`, as tasks do usuário desapareceram de `/tasks` sem aviso; após `DELETE /categories/<id>`, a task ficou com `category_id: null`. Quem confia na mensagem não percebe a perda de dados.
+**Recommendation:** explicitar o efeito colateral ou devolver a contagem afetada; revisar estas strings **depois** das correções de AP-19 (PB-24)
+
+**Verificados sem ocorrência:** AP-02 (SQL Injection — não há SQL montado por string; o único `LIKE` em `task_routes.py:252-253` envia o padrão como parâmetro vinculado, e o curinga não escapado está em AP-14) · AP-16 (Callback hell — não se aplica, código síncrono).
+
+```
+================================
+Total: 24 findings
+================================
+```
+
+Relatório em `.refactor-arch/audit-report.md`, baseline em `.refactor-arch/baseline.md`. Nenhum arquivo do projeto foi alterado — os únicos acréscimos não rastreados são `.refactor-arch/`, `.venv/`, `instance/tasks.db` e `__pycache__/`, todos gerados pelo baseline. O diretório `../reports/` não existe neste repositório.
+
+```
+Phase 2 complete. Proceed with refactoring (Phase 3)? [y/n]
+```
+
+[result] subtype=success turns=60 duration_ms=991423
+
+--- git status --short (cópia do original após Fases 1-2) ---
+?? .refactor-arch/audit-report.md
+?? .refactor-arch/baseline-server.log
+?? .refactor-arch/baseline.md
+?? .refactor-arch/phase1-analysis.md
+?? __pycache__/app.cpython-314.pyc
+?? __pycache__/database.cpython-314.pyc
+?? instance/tasks.db
+?? models/__pycache__/__init__.cpython-314.pyc
+?? models/__pycache__/category.cpython-314.pyc
+?? models/__pycache__/task.cpython-314.pyc
+?? models/__pycache__/user.cpython-314.pyc
+?? routes/__pycache__/__init__.cpython-314.pyc
+?? routes/__pycache__/report_routes.cpython-314.pyc
+?? routes/__pycache__/task_routes.cpython-314.pyc
+?? routes/__pycache__/user_routes.cpython-314.pyc
+?? utils/__pycache__/__init__.cpython-314.pyc
+?? utils/__pycache__/helpers.cpython-314.pyc

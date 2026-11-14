@@ -1,0 +1,82 @@
+#1 [200] {"endpoints":{"health":"/health","login":"/login","pedidos":"/pedidos","produtos":"/produtos","relatorios":"/relatorios/vendas","usuarios":"/usuarios"},"mensagem":"Bem-vindo \u00e0 API da Loja","versao":"1.0.0"}
+#2 [200] {"ambiente":"development","counts":{"pedidos":0,"produtos":10,"usuarios":3},"database":"connected","status":"ok","versao":"1.0.0"}
+#3 [200] {"dados":[{"ativo":1,"categoria":"informatica","criado_em":"2026-11-14 13:24:00","descricao":"Notebook potente para jogos","estoque":10,"id":1,"nome":"Notebook Gamer","preco":5999.99},{"ativo":1,"categoria":"informatica","criado_em":"2026-11-14 13:24:00","desc
+#4 [200] {"dados":{"ativo":1,"categoria":"informatica","criado_em":"2026-11-14 13:24:00","descricao":"Notebook potente para jogos","estoque":10,"id":1,"nome":"Notebook Gamer","preco":5999.99},"sucesso":true}
+#5 [404] {"erro":"Produto n\u00e3o encontrado","sucesso":false}
+#6 [200] {"dados":[{"ativo":1,"categoria":"informatica","criado_em":"2026-11-14 13:24:00","descricao":"Notebook potente para jogos","estoque":10,"id":1,"nome":"Notebook Gamer","preco":5999.99},{"ativo":1,"categoria":"informatica","criado_em":"2026-11-14 13:24:00","desc
+#7 [200] {"dados":[{"ativo":1,"categoria":"moveis","criado_em":"2026-11-14 13:24:00","descricao":"Cadeira ergon\u00f4mica","estoque":8,"id":6,"nome":"Cadeira Gamer","preco":1299.9}],"sucesso":true,"total":1}
+#8 [200] {"dados":[],"sucesso":true,"total":0}
+#9 [200] {"dados":[],"sucesso":true,"total":0}
+#10 [200] {"dados":[{"criado_em":"2026-11-14 13:24:00","email":"admin@loja.com","id":1,"nome":"Admin","tipo":"admin"},{"criado_em":"2026-11-14 13:24:00","email":"joao@email.com","id":2,"nome":"Jo\u00e3o Silva","tipo":"cliente"},{"criado_em":"2026-11-14 13:24:00","email"
+#11 [200] {"dados":{"criado_em":"2026-11-14 13:24:00","email":"admin@loja.com","id":1,"nome":"Admin","tipo":"admin"},"sucesso":true}
+#12 [404] {"erro":"Usu\u00e1rio n\u00e3o encontrado"}
+#13 [200] {"dados":[],"sucesso":true}
+#14 [200] {"dados":[],"sucesso":true}
+#15 [200] {"dados":{"desconto_aplicavel":0,"faturamento_bruto":0,"faturamento_liquido":0,"pedidos_aprovados":0,"pedidos_cancelados":0,"pedidos_pendentes":0,"ticket_medio":0,"total_pedidos":0},"sucesso":true}
+#16 [200] {"dados":{"email":"admin@loja.com","id":1,"nome":"Admin","tipo":"admin"},"mensagem":"Login OK","sucesso":true}
+#17 [401] {"erro":"Email ou senha inv\u00e1lidos","sucesso":false}
+#18 [401] {"erro":"Email ou senha inv\u00e1lidos","sucesso":false}
+#19 [400] {"erro":"Email e senha s\u00e3o obrigat\u00f3rios"}
+#20 [400] {"erro":"Email e senha s\u00e3o obrigat\u00f3rios"}
+#21 [201] {"dados":{"id":11},"mensagem":"Produto criado","sucesso":true}
+#22 [400] {"erro":"Pre\u00e7o \u00e9 obrigat\u00f3rio"}
+#23 [400] {"erro":"Categoria inv\u00e1lida. V\u00e1lidas: ['informatica', 'moveis', 'vestuario', 'geral', 'eletronicos', 'livros']"}
+#24 [400] {"erro":"Pre\u00e7o n\u00e3o pode ser negativo"}
+#25 [201] {"dados":{"id":12},"mensagem":"Produto criado","sucesso":true}
+#26 [201] {"dados":{"id":4},"sucesso":true}
+#27 [400] {"erro":"Nome, email e senha s\u00e3o obrigat\u00f3rios"}
+#28 [201] {"dados":{"pedido_id":1,"total":6179.79},"mensagem":"Pedido criado com sucesso","sucesso":true}
+#29 [400] {"erro":"Produto 999 n\u00e3o encontrado","sucesso":false}
+#30 [400] {"erro":"Estoque insuficiente para Cadeira Gamer","sucesso":false}
+#31 [400] {"erro":"Pedido deve ter pelo menos 1 item"}
+#32 [400] {"erro":"Usu\u00e1rio n\u00e3o encontrado","sucesso":false}
+#33 [200] {"dados":[{"criado_em":"2026-11-14 13:24:00","id":1,"itens":[{"preco_unitario":5999.99,"produto_id":1,"produto_nome":"Notebook Gamer","quantidade":1},{"preco_unitario":89.9,"produto_id":2,"produto_nome":"Mouse Wireless","quantidade":2}],"status":"pendente","to
+#34 [200] {"dados":[{"criado_em":"2026-11-14 13:24:00","id":1,"itens":[{"preco_unitario":5999.99,"produto_id":1,"produto_nome":"Notebook Gamer","quantidade":1},{"preco_unitario":89.9,"produto_id":2,"produto_nome":"Mouse Wireless","quantidade":2}],"status":"pendente","to
+#35 [200] {"dados":{"desconto_aplicavel":308.99,"faturamento_bruto":6179.79,"faturamento_liquido":5870.8,"pedidos_aprovados":0,"pedidos_cancelados":0,"pedidos_pendentes":1,"ticket_medio":6179.79,"total_pedidos":1},"sucesso":true}
+#36 [200] {"dados":{"ativo":1,"categoria":"informatica","criado_em":"2026-11-14 13:24:00","descricao":"Notebook potente para jogos","estoque":9,"id":1,"nome":"Notebook Gamer","preco":5999.99},"sucesso":true}
+#37 [200] {"mensagem":"Produto atualizado","sucesso":true}
+#38 [404] {"erro":"Produto n\u00e3o encontrado"}
+#39 [400] {"erro":"Pre\u00e7o \u00e9 obrigat\u00f3rio"}
+#40 [400] {"erro":"Nome muito curto"}
+#41 [200] {"mensagem":"Status atualizado","sucesso":true}
+#42 [400] {"erro":"Status inv\u00e1lido"}
+#43 [404] {"erro":"Pedido n\u00e3o encontrado"}
+#44 [404] {"erro":"Produto n\u00e3o encontrado"}
+#45 [200] {"dados":[{"email":"admin@loja.com","id":1,"senha":"scrypt:32768:8:1$owCSAADYtGdhmmUy$107524ed82b86704a504580bfbb504545ea8074ea097a5dba1f79ffacec4cf09f50604bb6f2f4d12cac654de7cc86171adcae5636dcd0a63e170520376e96264"},{"email":"joao@email.com","id":2,"senha":"s
+#46 [400] {"erro":"Query n\u00e3o informada"}
+#47 [400] {"erro":"Apenas consultas SELECT s\u00e3o permitidas"}
+#48 [200] {"ambiente":"development","counts":{"pedidos":1,"produtos":12,"usuarios":4},"database":"connected","status":"ok","versao":"1.0.0"}
+#49 [200] {"mensagem":"Banco de dados resetado","sucesso":true}
+#50 [200] {"ambiente":"development","counts":{"pedidos":0,"produtos":0,"usuarios":0},"database":"connected","status":"ok","versao":"1.0.0"}
+#51 [201] {"dados":{"id":13},"mensagem":"Produto criado","sucesso":true}
+(novo id 14)
+#52 [200] {"mensagem":"Produto deletado","sucesso":true}
+#53 [404] {"erro":"Produto n\u00e3o encontrado"}
+#54 [404] {"erro":"The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."}
+--- sem token (esperado 401)
+#55 [401] {"erro":"N\u00e3o autorizado"}
+#56 [401] {"erro":"N\u00e3o autorizado"}
+#57 [401] {"erro":"N\u00e3o autorizado"}
+#58 [401] {"erro":"N\u00e3o autorizado"}
+#59 [401] {"erro":"N\u00e3o autorizado"}
+#60 [401] {"erro":"N\u00e3o autorizado"}
+#61 [401] {"erro":"N\u00e3o autorizado"}
+#62 [401] {"erro":"N\u00e3o autorizado"}
+#63 [401] {"erro":"N\u00e3o autorizado"}
+#64 [401] {"erro":"N\u00e3o autorizado"}
+--- extras
+#65 [400] {"erro":"Apenas consultas SELECT s\u00e3o permitidas"}
+#66 [400] {"erro":"Query inv\u00e1lida"}
+#67 [400] {"erro":"Item de pedido inv\u00e1lido: produto_id e quantidade (> 0) inteiros s\u00e3o obrigat\u00f3rios"}
+#68 [400] {"erro":"Pre\u00e7o deve ser num\u00e9rico"}
+#69 [400] {"erro":"preco_min inv\u00e1lido"}
+#70 [201] {"dados":{"id":5},"sucesso":true}
+#71 [400] {"erro":"Produto 6 n\u00e3o encontrado","sucesso":false}
+#72 [200] HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.14.3
+Date: Sat, 14 Nov 2026 13:24:01 GMT
+Content-Type: text/html; charset=utf-8
+Allow: HEAD, GET, POST, OPTIONS
+Content-Length: 0
+Connection: close
+

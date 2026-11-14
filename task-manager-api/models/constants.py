@@ -1,0 +1,39 @@
+"""Constantes de domínio (os valores são contrato com o banco e com a API)."""
+
+TASK_STATUS_PENDING = "pending"
+TASK_STATUS_IN_PROGRESS = "in_progress"
+TASK_STATUS_DONE = "done"
+TASK_STATUS_CANCELLED = "cancelled"
+VALID_TASK_STATUSES = (
+    TASK_STATUS_PENDING,
+    TASK_STATUS_IN_PROGRESS,
+    TASK_STATUS_DONE,
+    TASK_STATUS_CANCELLED,
+)
+CLOSED_TASK_STATUSES = (TASK_STATUS_DONE, TASK_STATUS_CANCELLED)
+
+MIN_PRIORITY = 1
+MAX_PRIORITY = 5
+DEFAULT_PRIORITY = 3
+HIGH_PRIORITY_THRESHOLD = 2  # prioridade <= 2 conta como "alta" no relatório do usuário
+PRIORITY_LABELS = {1: "critical", 2: "high", 3: "medium", 4: "low", 5: "minimal"}
+
+MIN_TITLE_LENGTH = 3
+MAX_TITLE_LENGTH = 200
+TASK_DATE_FORMAT = "%Y-%m-%d"
+
+ROLE_USER = "user"
+ROLE_ADMIN = "admin"
+ROLE_MANAGER = "manager"
+VALID_ROLES = (ROLE_USER, ROLE_ADMIN, ROLE_MANAGER)
+DEFAULT_ROLE = ROLE_USER
+MIN_PASSWORD_LENGTH = 4
+EMAIL_REGEX = r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$"
+
+DEFAULT_CATEGORY_COLOR = "#000000"
+COLOR_LENGTH = 7
+
+RECENT_ACTIVITY_DAYS = 7
+
+API_NAME = "Task Manager API"
+API_VERSION = "1.0"

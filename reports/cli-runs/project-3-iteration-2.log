@@ -1,0 +1,304 @@
+# Log real do Claude Code CLI — task-manager-api
+# Turno 1: cd <repo>/task-manager-api && claude -p "/refactor-arch"   (re-execução sobre o código já refatorado; Fases 1-2, pausa no gate)
+
+  [tool] Bash: Inspect project root and prior refactor-arch output
+  [tool] Read: <repo>/task-manager-api/.claude/skills/refactor-arch/references/project-a
+  [tool] Read: <repo>/task-manager-api/.claude/skills/refactor-arch/references/report-te
+  [tool] Bash: Inventory source files and prior iterations
+  [tool] Read: <repo>/task-manager-api/.refactor-arch/iteration-1/refactor-summary.md
+Projeto já refatorado antes (iteration-1 presente). Modo re-execução. Vou carregar o todo-tool e ler tudo.
+  [tool] ToolSearch: 
+  [tool] Bash: Read manifests, README, env example, venv state
+  [tool] Bash: Read entry point, db, errors, seed, config
+  [tool] Bash: Read models
+  [tool] TodoWrite: 
+  [tool] Bash: Read routes
+  [tool] Bash: Read controllers and middlewares
+  [tool] Bash: Read services, utils, validators
+  [tool] Read: <repo>/task-manager-api/.refactor-arch/iteration-1/baseline.md
+  [tool] Bash: Check free ports, existing DB schema, route table
+Banco existente sem DDL `ondelete` (confirma item anterior). Agora seed + boot + baseline.
+  [tool] Write: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill-task-manager-api/062fb20d-f909-4554-b9e4-5
+  [tool] Bash: Seed DB, boot app on 5401, smoke test login
+  [tool] Bash: Run full baseline replay against all routes
+  [tool] Bash: Check server log for warnings, then stop baseline server
+Baseline limpo (sem deprecation warnings, sem traceback). Servidor parado. Escrevendo artefatos da Fase 1.
+  [tool] Write: <repo>/task-manager-api/.refactor-arch/baseline.md
+  [tool] Write: <repo>/task-manager-api/.refactor-arch/phase1-analysis.md
+  [tool] TodoWrite: 
+  [tool] Read: <repo>/task-manager-api/.claude/skills/refactor-arch/references/anti-patt
+  [tool] Bash: Run catalog detection greps AP-01..AP-25
+  [tool] Grep: (secret|passw|pwd|senha|token|api_?key|private_?key|smtp_?(user|pass))\w*\s*[=:]\s*['"][^'"]{3,}['"]
+  [tool] Grep: execute\(\s*f['"]|execute\([^)]*(\+|%|\.format\()|['"](SELECT|INSERT|UPDATE|DELETE)[^'"]*['"]\s*\+|text\(\s*f['"]|hashli
+  [tool] Grep: datetime\.utcnow|['"](password|senha|secret_key)['"]\s*:|except\s*:|except Exception|str\(e\)|errorhandler\(|CORS\(|orig
+  [tool] Bash: Run remaining catalog checks: dead code, auth usage, seed secrets, magic numbers
+Greps feitos. Preciso de evidência de runtime para dois pontos (takeover anônimo de senha e entradas que ainda quebram). Subindo servidor de sonda.
+  [tool] Bash: Probe anonymous write takeover and type-validation gaps
+  [tool] Bash: Capture probe log evidence, stop server, re-seed, confirm exact lines
+Evidência coletada, servidores parados, banco re-semeado. Consultando antes de fechar severidades.
+  [tool] Bash: Confirm all cited line numbers and counts
+Linhas confirmadas. Escrevendo o relatório.
+  [tool] Write: <repo>/task-manager-api/.refactor-arch/audit-report.md
+  [tool] TodoWrite: 
+```
+================================
+PHASE 1: PROJECT ANALYSIS
+================================
+Language:      Python 3.14.3
+Framework:     Flask 3.0.0 (Flask-SQLAlchemy 3.1.1, SQLAlchemy 2.1.8 transitivo)
+Dependencies:  flask-sqlalchemy 3.1.1, flask-cors 4.0.0, python-dotenv 1.0.0 (todas importadas); marshmallow, requests e pyflakes instalados no .venv fora do requirements.txt e não importados
+Domain:        Task Manager API (tasks, users, categories, reports)
+Architecture:  MVC em camadas — config/, models/, validators/, services/, controllers/, routes/, middlewares/ com app factory (app.py:17) e error handler central (middlewares/error_handler.py:16)
+Source files:  37 files analyzed
+DB tables:     users, tasks, categories (SQLite via Flask-SQLAlchemy, instance/tasks.db)
+================================
+```
+
+Entry point `app.py` (`create_app()` + `app = create_app()`), start original `python app.py`. 22 rotas em 5 blueprints. Baseline em `.refactor-arch/baseline.md`: 63 requisições, boot `PORT=5401 .venv/bin/python -W default app.py`, log limpo (sem deprecation warning, sem traceback), servidor parado. Modo re-execução: `iteration-1/` preservada, nenhum arquivo de topo a arquivar.
+
+```
+================================
+ARCHITECTURE AUDIT REPORT
+================================
+Project: task-manager-api
+Stack:   Python 3.14.3 + Flask 3.0.0 (Flask-SQLAlchemy 3.1.1 / SQLAlchemy 2.1.8)
+Files:   37 analyzed | ~1422 lines of code
+
+## Summary
+CRITICAL: 3 | HIGH: 1 | MEDIUM: 3 | LOW: 1
+
+## Findings
+
+### [CRITICAL] Credenciais / segredos hardcoded (AP-01)
+File: seed.py:15-21
+Description: As três contas de fixture têm senha literal no código: '1234' (João Silva, role 'admin'), 'abcd' e 'pass' em SEED_USERS (seed.py:18-20). O comentário em seed.py:15-16 declara a escolha como intencional, mas o catálogo trata senha literal de conta inicial como AP-01 mesmo gravada com hash. Nenhuma vem do ambiente nem é gerada aleatoriamente.
+Impact: Quem tem acesso ao repositório conhece a senha do admin. Evidência: baseline #22 — POST /login joao@email.com/1234 → 200 com role "admin".
+Recommendation: Ler cada senha de env sem fallback literal; gerar com secrets.token_urlsafe() quando ausente e imprimir uma vez; documentar em .env.example. (playbook PB-25, com PB-01)
+
+### [CRITICAL] Endpoints de escrita sem autenticação — takeover anônimo de conta (AP-06)
+File: routes/user_routes.py:19-26
+File: controllers/user_controller.py:45-62
+File: routes/task_routes.py:19-26
+File: routes/category_routes.py:14-21
+Description: update_user só chama ensure_admin quando 'role' está presente (:57-59). password (:55-56), email (:51-54), name (:49-50) e active (:60-61) são aceitos anonimamente — routes/user_routes.py:24-26 não tem decorator de auth. Idem POST /tasks, PUT /tasks/<id>, POST /users com role default, POST /categories e PUT /categories/<id>.
+Impact: Takeover completo de qualquer conta, inclusive admin, sem credencial. Evidência (probe-server.log): PUT /users/1 {"password":"invadido123"} → 200 e POST /login com a nova senha → 200 com role "admin". Também anonimamente: troca de e-mail (PUT /users/2 → 200) e desativação (PUT /users/3 {"active":false} → 200). Baseline #43 registra o mesmo buraco.
+Recommendation: Exigir identidade autenticada em todas as escritas e autorização por proprietário/papel em /users/<id>; senha só do próprio usuário (com a senha atual) ou admin. Depende de PB-21. (playbook PB-07, com PB-21 e PB-22)
+
+### [CRITICAL] Token de autenticação previsível e nunca verificado (AP-24)
+File: controllers/user_controller.py:17, 81
+Description: POST /login devolve 'fake-jwt-token-' + str(user.id): sem assinatura, sem expiração, idêntico em todo login. Nenhuma rota o verifica — grep por Authorization/jwt.decode/verify_token/login_required/before_request sem ocorrências; a única credencial checada é o X-Admin-Token estático (middlewares/auth.py:12-18).
+Impact: Qualquer cliente forja o token de qualquer usuário (fake-jwt-token-1 é o admin). O login não protege nada e é a peça que falta para fechar AP-06 e AP-25. Evidência: baseline #22 e #23 devolvem o mesmo token.
+Recommendation: Token assinado com SECRET_KEY (itsdangerous já disponível, ou JWT) com id, papel e expiração, mais decorator require_auth validando Authorization: Bearer. Campo token continua string. (playbook PB-21)
+
+### [HIGH] PII listada em endpoint sem autenticação (AP-25)
+File: routes/user_routes.py:9-16
+File: routes/report_routes.py:13-15
+File: models/user.py:24
+File: services/report_service.py:102
+Description: GET /users, GET /users/<id> e GET /reports/user/<id> sem decorator de auth devolvem nome + e-mail de todos os usuários; ids sequenciais tornam a enumeração trivial.
+Impact: Extração anônima de nomes, e-mails e role, identificando contas administrativas. Com AP-06, o atacante lê os e-mails e troca a senha do admin. Evidência: baseline #10, #11, #16.
+Recommendation: require_auth nas três rotas; GET /users só admin, detalhe e relatório só próprio usuário ou admin. Chaves de resposta inalteradas. (playbook PB-22, com PB-21)
+
+### [MEDIUM] Agregação em memória no relatório por usuário (AP-13)
+File: services/report_service.py:89-109
+Description: user_report carrega todas as tasks do usuário (:91) só para contar — laço em :94-96, len() em :97 e três varreduras em :107-109. Nenhuma task entra na resposta, que devolve só números. summary_report, no mesmo arquivo, usa GROUP BY/outer join (:24-26, :43-49).
+Impact: Custo de GET /reports/user/<id> cresce linearmente com as tasks do usuário para produzir 8 inteiros; duas estratégias para o mesmo cálculo no mesmo arquivo. A regra de atraso também vive duplicada (task_service.py:17-23 em SQL, models/task.py:53-56 em Python).
+Recommendation: Consulta agregada com GROUP BY + COUNT/CASE reaproveitando overdue_filter e HIGH_PRIORITY_THRESHOLD, como em _user_productivity (:42-59). Resposta idêntica. (playbook PB-10)
+
+### [MEDIUM] Validação de tipo ausente em campos de task (AP-14)
+File: validators/task_validator.py:79-81, 92-93, 98-100
+Description: user_id, category_id e due_date saem crus de validate_new_task (:79-81); description (:92-93) e os mesmos três (:98-100) saem crus de validate_task_update. title, status, priority e tags são validados por tipo; esses não. O valor estoura no bind do SQLite.
+Impact: Três 500 confirmados (probe-server.log): {"user_id":{"a":1}} → 500 "Erro interno do servidor" (sqlite3.ProgrammingError: Error binding parameter 1: type 'dict' is not supported); {"description":{"x":1}} → 500 "Erro ao atualizar"; {"user_id":[1]} → 500 "Erro ao criar task". Nos dois últimos a mensagem de falha de commit mascara erro permanente de tipo como falha transitória de escrita. Deveria ser 400.
+Recommendation: Validar user_id/category_id como inteiros positivos (validators/common.py:19-26), due_date como string antes de parse_due_date, description como string ou None → ValidationError 400. (playbook PB-11)
+
+### [MEDIUM] Fonte de data divergente em /health (AP-15)
+File: routes/system_routes.py:1, 13
+File: utils/helpers.py:5-7
+Description: /health usa datetime.datetime.now() (hora local) enquanto todo o resto usa o helper único utils.helpers.utcnow(), inclusive defaults de coluna e generated_at. Nenhum campo carrega offset.
+Impact: Dois timestamps da mesma API, ambos sem fuso, em escalas diferentes. Baseline #2: "11:56:25" contra created_at "14:56:16" da mesma execução — 3 horas. Cliente que use /health como referência erra por um fuso; em servidor com TZ=UTC o bug desaparece silenciosamente.
+Recommendation: Usar utcnow() em routes/system_routes.py:13. Atenção: altera valor observável (não a chave nem o tipo), logo é mudança de contrato que exige aprovação; se o valor local tiver de ficar, documentá-lo. (playbook PB-18, com PB-24)
+
+### [LOW] Código morto e dependências fora do manifesto (AP-23)
+File: config/settings.py:52-58
+File: config/__init__.py:1, 3
+File: database.py:27
+File: models/__init__.py:1-3
+Description: TestConfig e get_config() nunca usados — grep só acha a definição e o re-export; create_app usa Config por default e é chamado sem argumento (app.py:39). Os 3 F401 de models/__init__.py:1-3 e o de database.py:27 são re-export/registro intencionais (este já tem noqa), não código morto: falta __all__/noqa. marshmallow, requests e pyflakes instalados no .venv, não importados e fora do requirements.txt.
+Impact: Código inalcançável sugere capacidade de teste inexistente; pacotes órfãos fazem o ambiente local divergir de uma instalação limpa.
+Recommendation: Usar ou apagar TestConfig/get_config e o re-export; __all__ em models/__init__.py; recriar o .venv só com requirements.txt. (playbook PB-18)
+
+Deprecated APIs: nenhuma ocorrência encontrada (greps: datetime.utcnow|utcfromtimestamp, .query., query.(get|first)_or_404, before_first_request, JSONEncoder|json_encoder, _app_ctx_stack, attachment_filename, hashlib.(md5|sha1|sha256), ext.declarative, engine.execute(, type(x)==). Os 8 hits de utcnow() são o helper próprio (utils/helpers.py:5, datetime.now(timezone.utc)). Boot com -W default no Python 3.14.3 / SQLAlchemy 2.1.8 sem DeprecationWarning nem LegacyAPIWarning.
+
+Verificados sem ocorrência: AP-02, AP-03, AP-04, AP-05, AP-07, AP-08, AP-09, AP-10, AP-11, AP-12, AP-16, AP-18, AP-19, AP-20, AP-21, AP-22, AP-26 — detalhe e evidência de cada um em .refactor-arch/audit-report.md.
+
+## Previous Remaining Known Issues
+- Token de admin X-Admin-Token/ADMIN_TOKEN → informativo, confirmado (baseline #33/#34, #50/#51; validação em config/settings.py:41-49).
+- fake-jwt-token-<id> previsível e não validado → persiste (AP-24, agora CRITICAL).
+- AP-01 parcial: senhas de fixture literais → persiste (AP-01, agora CRITICAL) — seed.py:18-20.
+- Hashes MD5 antigos não logam → resolvido por design (models/user.py:33-38); banco recriado nesta sessão, login OK.
+- ondelete só em banco novo → persiste no banco, não no código: .schema tasks sem ON DELETE, models/task.py:14-15 declara; integridade validada por PRAGMA+ORM (baseline #56, #62).
+- Validação manual em vez de marshmallow → informativo; marshmallow fora do requirements.txt mas ainda no .venv.
+- Novas validações só rejeitam o que dava 500 → confirmado (#8, #28, #48 agora 400). Ressalva: cobertura parcial, ver AP-14.
+- 500 genérico com mensagens de commit preservadas → confirmado; é o que mascara AP-14.
+- LIKE não escapa % e _ → persiste, intencional (task_service.py:76-77); não é injeção, não virou finding.
+- pyflakes só no .venv → informativo, confirmado (citado em AP-23).
+
+================================
+Total: 8 findings
+================================
+```
+
+Relatório salvo em `.refactor-arch/audit-report.md`. O diretório `../reports/` existe (já tem `audit-project-1..3.md`) — o relatório pode ser copiado para lá se você quiser; não escolhi nome nem copiei.
+
+Phase 2 complete. Proceed with refactoring (Phase 3)? [y/n]
+
+[result] subtype=success turns=34 duration_ms=649441
+
+
+
+# Turno 2: claude -p "y" --resume <session-id>   (confirmação → Fase 3)
+
+  [tool] Read: <repo>/task-manager-api/.claude/skills/refactor-arch/references/refactori
+  [tool] Read: <repo>/task-manager-api/.claude/skills/refactor-arch/references/mvc-guide
+Fase 3 aprovada. Arquitetura já em camadas → correções pontuais dos 8 findings.
+  [tool] Edit: <repo>/task-manager-api/config/settings.py
+  [tool] Edit: <repo>/task-manager-api/config/settings.py
+  [tool] Write: <repo>/task-manager-api/config/__init__.py
+  [tool] Write: <repo>/task-manager-api/middlewares/auth.py
+  [tool] Write: <repo>/task-manager-api/routes/user_routes.py
+  [tool] Write: <repo>/task-manager-api/routes/task_routes.py
+  [tool] Write: <repo>/task-manager-api/routes/category_routes.py
+  [tool] Write: <repo>/task-manager-api/routes/report_routes.py
+  [tool] TodoWrite: 
+  [tool] Edit: <repo>/task-manager-api/controllers/user_controller.py
+  [tool] Edit: <repo>/task-manager-api/controllers/user_controller.py
+  [tool] Edit: <repo>/task-manager-api/controllers/user_controller.py
+Agora validação de tipos (AP-14), agregação (AP-13), seed (AP-01) e limpeza.
+  [tool] Edit: <repo>/task-manager-api/validators/common.py
+  [tool] Edit: <repo>/task-manager-api/validators/task_validator.py
+  [tool] Edit: <repo>/task-manager-api/validators/task_validator.py
+  [tool] Edit: <repo>/task-manager-api/validators/task_validator.py
+  [tool] Edit: <repo>/task-manager-api/services/report_service.py
+  [tool] Edit: <repo>/task-manager-api/services/report_service.py
+  [tool] Edit: <repo>/task-manager-api/utils/helpers.py
+  [tool] Write: <repo>/task-manager-api/routes/system_routes.py
+  [tool] Write: <repo>/task-manager-api/models/__init__.py
+Falta o seed (AP-01) e a documentação.
+  [tool] Edit: <repo>/task-manager-api/seed.py
+  [tool] Edit: <repo>/task-manager-api/seed.py
+  [tool] Write: <repo>/task-manager-api/.env.example
+  [tool] Write: <repo>/task-manager-api/README.md
+  [tool] Bash: Remove unused deps, lint, byte-compile
+  [tool] Write: <repo>/task-manager-api/.refactor-arch/replay.sh
+  [tool] Bash: Re-seed with env passwords, recreate DB, boot refactored app
+  [tool] Bash: Run validation replay with credentials
+  [tool] Bash: Compare response shapes against baseline
+  [tool] Bash: Check log, alt start command, seed without env vars
+  [tool] Bash: Re-grep catalog signals for all fixed findings
+  [tool] Bash: Re-seed with dev passwords, stop all servers, list final tree
+  [tool] Write: <repo>/task-manager-api/.refactor-arch/refactor-summary.md
+  [tool] TodoWrite: 
+  [tool] Bash: Verify AP-13 non-zero completion_rate, 403/404 behavior, AP-26 re-check
+  [tool] Edit: <repo>/task-manager-api/.refactor-arch/refactor-summary.md
+  [tool] Edit: <repo>/task-manager-api/.refactor-arch/refactor-summary.md
+  [tool] Edit: <repo>/task-manager-api/.refactor-arch/refactor-summary.md
+```
+================================
+PHASE 3: REFACTORING COMPLETE
+================================
+## New Project Structure
+task-manager-api/
+├── app.py (composition root: create_app() + app = create_app())
+├── config/
+│   ├── __init__.py
+│   └── settings.py (env + TOKEN_MAX_AGE; recusa defaults de dev em produção)
+├── database.py (db, init_db com PRAGMA foreign_keys, commit transacional)
+├── errors.py (exceções de domínio)
+├── models/
+│   ├── __init__.py (__all__ com os 3 models)
+│   ├── constants.py
+│   ├── category.py
+│   ├── task.py
+│   └── user.py
+├── validators/
+│   ├── __init__.py
+│   ├── common.py (require_payload, parse_int_param, validate_optional_id/_text)
+│   ├── category_validator.py
+│   ├── task_validator.py
+│   └── user_validator.py
+├── services/
+│   ├── __init__.py
+│   ├── category_service.py
+│   ├── report_service.py (agregações 100% no banco)
+│   ├── task_service.py
+│   └── user_service.py
+├── controllers/
+│   ├── __init__.py
+│   ├── category_controller.py
+│   ├── report_controller.py
+│   ├── task_controller.py
+│   └── user_controller.py
+├── routes/
+│   ├── __init__.py
+│   ├── category_routes.py
+│   ├── report_routes.py
+│   ├── system_routes.py
+│   ├── task_routes.py
+│   └── user_routes.py
+├── middlewares/
+│   ├── __init__.py
+│   ├── auth.py (issue_token, verify_token, require_auth, ensure_owner_or_admin, require_admin)
+│   └── error_handler.py
+├── utils/
+│   ├── __init__.py
+│   └── helpers.py (utcnow, localnow, calculate_percentage, format_datetime)
+├── seed.py (senhas das fixtures vindas do ambiente)
+├── requirements.txt
+├── README.md
+└── .env.example
+
+Pastas inalteradas (projeto já estava em camadas MVC): 37 arquivos Python, ~1556 linhas. Nenhum arquivo criado nem removido; correções pontuais nos arquivos dos 8 findings.
+
+## Changes Applied
+  [AP-01] Senhas do seed vindas de SEED_ADMIN_PASSWORD/SEED_USER_PASSWORD/SEED_MANAGER_PASSWORD, sem fallback literal; sem a variável, seed_password() gera secrets.token_urlsafe(12) e imprime uma vez; em APP_ENV=production o seed exige as variáveis → seed.py, .env.example, README.md
+  [AP-06] @require_auth em POST/PUT de /tasks e /categories; PUT /users/<id> exige @require_auth + ensure_owner_or_admin (fim do takeover anônimo de senha/e-mail/active); DELETE segue só com X-Admin-Token; POST /users e POST /login seguem públicos → routes/task_routes.py, routes/category_routes.py, routes/user_routes.py, middlewares/auth.py
+  [AP-24] POST /login devolve token assinado com SECRET_KEY via itsdangerous.URLSafeTimedSerializer e expiração TOKEN_MAX_AGE (3600 s); verify_token/require_auth validam Authorization: Bearer; 'fake-jwt-token-' removido; produção recusa SECRET_KEY/ADMIN_TOKEN com defaults de dev → middlewares/auth.py, controllers/user_controller.py, config/settings.py
+  [AP-25] GET /users e GET /reports/summary exigem credencial; GET /users/<id>, GET /users/<id>/tasks e GET /reports/user/<id> exigem token do próprio usuário ou X-Admin-Token (403 para terceiros) → routes/user_routes.py, routes/report_routes.py
+  [AP-13] user_report passou de "carregar todas as tasks e contar em Python" para uma consulta agregada (COUNT + SUM(CASE ...) por status, atraso e prioridade alta), reaproveitando task_service.overdue_filter; _count_if virou helper único, também usado por _user_productivity → services/report_service.py
+  [AP-14] user_id/category_id validados como inteiro ou nulo e description como texto ou nulo, em criação e atualização: os três 500 de bind do SQLite viraram 400 → validators/common.py, validators/task_validator.py
+  [AP-15] (parcial) /health usa utils.helpers.localnow() em vez de datetime.datetime.now() inline: a divergência de fuso ficou num único ponto nomeado. O valor da resposta não mudou (segue hora local) por ser contrato — ver Remaining
+  [AP-23] TestConfig e get_config() apagados junto com o re-export em config/__init__.py; __all__ em models/__init__.py; marshmallow e requests desinstalados do .venv → config/settings.py, config/__init__.py, models/__init__.py
+
+## Validation
+  ✓ Application boots without errors (PORT=5403 .venv/bin/python -W default app.py; log sem traceback, sem DeprecationWarning/LegacyAPIWarning)
+  ✓ All baseline endpoints respond (80 requisições: as 63 do baseline com credencial + 17 checagens de 401/403 e de tipo; nenhum 500 no log)
+  ✓ Original start command still works (python app.py via PORT=5403; também flask --app app run --port 5404 → GET /health 200, 23 rotas)
+  ✓ Seed / initial data loads (com SEED_*_PASSWORD → 3 usuários, 4 categorias, 10 tasks, IDs 1..10; sem elas, gera e imprime senhas aleatórias e também conclui)
+  ✓ Takeover anônimo fechado (PUT /users/1 {"password":"invadido123"} → 401; POST /login com essa senha → 401, contra 200/200 antes)
+  ✓ Auth validada em todas as rotas protegidas (401 sem credencial, 200/201 com Bearer, 403 com token de outro usuário, X-Admin-Token nos DELETE e no role)
+  ✓ No CRITICAL/HIGH catalog signals remaining (re-grep: sem senha literal no seed, sem fake-jwt, sem environ.get(..., "<literal>"), consumidor de Authorization em middlewares/auth.py:54, 11 guards em routes/, sem debug=True/0.0.0.0, sem password em serializer)
+  ✓ AP-13 verificado no ramo de divisão não-zero (GET /reports/user/3 → total_tasks 3, done 1, cancelled 1, pending 1, completion_rate 33.33; /reports/user/2 → 3 tasks, 0 done, 0.0), conferindo com user_productivity do baseline #15, que vem de caminho não alterado
+  ✓ AP-26 re-checado depois das correções (grep do catálogo sem resultados; 'Não autorizado' e 'Acesso negado' descrevem o que os guards fazem; nenhuma mensagem antiga ficou falsa)
+  ✓ Deprecated APIs / lint (pyflakes acusa só database.py:27 'models' imported but unused — registro intencional com # noqa: F401)
+  ✓ .env.example atualizado (TOKEN_MAX_AGE + as três senhas de seed)
+  ✓ DDL de integridade aplicado (instance/tasks.db recriado: ON DELETE CASCADE e ON DELETE SET NULL no schema, não só no ORM)
+  ✓ Servidores parados (lsof vazio em 5401, 5402, 5403, 5404, 5405)
+```
+
+Credenciais para revalidar: `export SEED_ADMIN_PASSWORD=1234 SEED_USER_PASSWORD=abcd SEED_MANAGER_PASSWORD=pass`, então `POST /login` (`joao@email.com`/`1234`) → `Authorization: Bearer <token>`; rotas admin com `X-Admin-Token: dev-admin-token`. Script pronto: `PORT=<porta> bash .refactor-arch/replay.sh`.
+
+Endpoint Comparison completa (58 linhas) e Remaining Known Issues (12 itens) em `.refactor-arch/refactor-summary.md`. Mudanças de comportamento intencionais, todas documentadas:
+
+| Antes | Depois |
+|---|---|
+| `PUT /users/<id>` anônimo trocava senha/e-mail de qualquer conta | 401 sem credencial, 403 de terceiro, 200 do próprio ou admin |
+| escritas em `/tasks` e `/categories` abertas | exigem `Bearer` ou `X-Admin-Token` |
+| `GET /users`, `/users/<id>`, `/reports/user/<id>`, `/reports/summary` abertos | exigem credencial (dono ou admin nos individuais) |
+| `token: "fake-jwt-token-<id>"` | token assinado com `SECRET_KEY`, expira em 1 h, verificado por `require_auth` |
+| 3 payloads de tipo errado → 500 | 400 com mensagem de domínio |
+| id inexistente para não-admin autenticado | 403 em vez de 404 (anti-enumeração) |
+
+Não resolvido: `/health` continua em hora local (3 h defasado dos `created_at` em UTC) — trocar muda valor observável da resposta e precisa da sua aprovação. Nenhum commit feito.
+
+[result] subtype=success turns=42 duration_ms=677256
+

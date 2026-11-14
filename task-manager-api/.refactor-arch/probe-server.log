@@ -1,0 +1,338 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+2026-11-14 11:59:35,123 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5402
+2026-11-14 11:59:35,123 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-11-14 11:59:39,066 INFO services.user_service: Usuário atualizado id=1
+2026-11-14 11:59:39,066 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "PUT /users/1 HTTP/1.1" 200 -
+2026-11-14 11:59:39,113 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "POST /login HTTP/1.1" 200 -
+2026-11-14 11:59:39,120 INFO services.user_service: Usuário atualizado id=2
+2026-11-14 11:59:39,120 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "PUT /users/2 HTTP/1.1" 200 -
+2026-11-14 11:59:39,127 INFO services.user_service: Usuário atualizado id=3
+2026-11-14 11:59:39,127 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "PUT /users/3 HTTP/1.1" 200 -
+2026-11-14 11:59:39,134 ERROR middlewares.error_handler: Erro não tratado
+Traceback (most recent call last):
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4068, in _get_impl
+    primary_key_identity = list(
+        primary_key_identity[prop.key]
+        for prop in mapper._identity_key_props
+    )
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4069, in <genexpr>
+    primary_key_identity[prop.key]
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+KeyError: 'id'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/routes/task_routes.py", line 26, in update_task
+    return jsonify(task_controller.update_task(task_id, request.get_json())), 200
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/controllers/task_controller.py", line 43, in update_task
+    task_service.ensure_references(changes.get('user_id'), changes.get('category_id'))
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/services/task_service.py", line 43, in ensure_references
+    if user_id and db.session.get(User, user_id) is None:
+                   ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/scoping.py", line 1090, in get
+    return self._proxied.get(
+           ~~~~~~~~~~~~~~~~~^
+        entity,
+        ^^^^^^^
+    ...<6 lines>...
+        bind_arguments=bind_arguments,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 3934, in get
+    return self._get_impl(
+           ~~~~~~~~~~~~~~^
+        entity,
+        ^^^^^^^
+    ...<7 lines>...
+        bind_arguments=bind_arguments,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4074, in _get_impl
+    raise sa_exc.InvalidRequestError(
+    ...<7 lines>...
+    ) from err
+sqlalchemy.exc.InvalidRequestError: Incorrect names of values in identifier to formulate primary key for session.get(); primary key attribute names are 'id' (synonym names are also accepted)
+2026-11-14 11:59:39,137 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "[35m[1mPUT /tasks/1 HTTP/1.1[0m" 500 -
+2026-11-14 11:59:39,143 ERROR database: Falha ao confirmar transação: Erro ao atualizar
+Traceback (most recent call last):
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.ProgrammingError: Error binding parameter 1: type 'dict' is not supported
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<repo>/task-manager-api/database.py", line 34, in commit
+    db.session.commit()
+    ~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/scoping.py", line 611, in commit
+    return self._proxied.commit()
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2177, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction.commit>", line 2, in commit
+    return target(fn, self, _to_root=_to_root)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1412, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction._prepare_impl>", line 2, in _prepare_impl
+    return target(fn, self)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1386, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4626, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "<sqlalchemy generated warned() wrapper for sqlalchemy.orm.session.Session._flush>", line 2, in _flush
+    return target(fn, self, objects=objects)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/util/deprecations.py", line 281, in warned
+    return fn(*args, **kwargs)  # type: ignore[no-any-return]
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4769, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4730, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 467, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 643, in execute
+    util.preloaded.orm_persistence._save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 84, in _save_obj
+    _emit_update_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        update,
+        ^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 929, in _emit_update_statements
+    c = connection.execute(
+        statement, multiparams, execution_options=execution_options
+    )
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1494, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 534, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1714, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<9 lines>...
+        param_dict=param_dict,
+    )
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1868, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1996, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (sqlite3.ProgrammingError) Error binding parameter 1: type 'dict' is not supported
+[SQL: UPDATE tasks SET description=?, updated_at=? WHERE tasks.id = ?]
+[parameters: ({'x': 1}, '2026-11-14 14:59:39.143486', 1)]
+(Background on this error at: https://sqlalche.me/e/21/f405)
+2026-11-14 11:59:39,147 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "[35m[1mPUT /tasks/1 HTTP/1.1[0m" 500 -
+2026-11-14 11:59:39,153 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "[31m[1mPUT /tasks/1 HTTP/1.1[0m" 400 -
+2026-11-14 11:59:39,160 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "[33mPOST /tasks HTTP/1.1[0m" 404 -
+2026-11-14 11:59:39,166 ERROR database: Falha ao confirmar transação: Erro ao criar task
+Traceback (most recent call last):
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.ProgrammingError: Error binding parameter 5: type 'list' is not supported
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<repo>/task-manager-api/database.py", line 34, in commit
+    db.session.commit()
+    ~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/scoping.py", line 611, in commit
+    return self._proxied.commit()
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 2177, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction.commit>", line 2, in commit
+    return target(fn, self, _to_root=_to_root)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1412, in commit
+    self._prepare_impl()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<sqlalchemy generated _go() wrapper for sqlalchemy.orm.session.SessionTransaction._prepare_impl>", line 2, in _prepare_impl
+    return target(fn, self)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 1386, in _prepare_impl
+    self.session.flush()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4626, in flush
+    self._flush(objects)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "<sqlalchemy generated warned() wrapper for sqlalchemy.orm.session.Session._flush>", line 2, in _flush
+    return target(fn, self, objects=objects)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/util/deprecations.py", line 281, in warned
+    return fn(*args, **kwargs)  # type: ignore[no-any-return]
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4769, in _flush
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 166, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/session.py", line 4730, in _flush
+    flush_context.execute()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 467, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/unitofwork.py", line 643, in execute
+    util.preloaded.orm_persistence._save_obj(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_mapper_hierarchy(self.mapper, False, False),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 92, in _save_obj
+    _emit_insert_statements(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/orm/persistence.py", line 1250, in _emit_insert_statements
+    result = connection.execute(
+        statement,
+        params,
+        execution_options=execution_options,
+    )
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1494, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/sql/elements.py", line 534, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1714, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<9 lines>...
+        param_dict=param_dict,
+    )
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1868, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1996, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.ProgrammingError: (sqlite3.ProgrammingError) Error binding parameter 5: type 'list' is not supported
+[SQL: INSERT INTO tasks (title, description, status, priority, user_id, category_id, created_at, updated_at, due_date, tags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: ('teste lista', '', 'pending', 3, [1], None, '2026-11-14 14:59:39.166060', '2026-11-14 14:59:39.166062', None, None)]
+(Background on this error at: https://sqlalche.me/e/21/f405)
+2026-11-14 11:59:39,167 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "[35m[1mPOST /tasks HTTP/1.1[0m" 500 -
+2026-11-14 11:59:39,174 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:59:39] "[31m[1mPUT /tasks/1 HTTP/1.1[0m" 400 -

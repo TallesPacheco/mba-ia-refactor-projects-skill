@@ -1,0 +1,231 @@
+# Log real do Claude Code CLI — ecommerce-api-legacy
+# Comando: cd <copia-do-original>/ecommerce-api-legacy && claude -p "/refactor-arch" (código ORIGINAL do commit inicial; pausa no gate da Fase 2)
+# Formato: textos do assistente + chamadas de ferramenta resumidas, extraídos do stream-json
+
+I'll run the refactor-arch skill.
+  [tool] Skill: 
+  [tool] Bash: List project root
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Bash: Inventory source files and count lines
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] ToolSearch: 
+  [tool] Bash: Check node version and prior runs
+  [tool] TodoWrite: 
+  [tool] Bash: Check port, install deps, verify sqlite3 binding
+  [tool] Bash: Install sqlite3 prebuilt binding and check port 3001
+  [tool] Bash: Boot baseline server on port 3001
+  [tool] Bash: Return to project root
+  [tool] Bash: Boot baseline server on port 3001
+  [tool] Bash: Exercise all baseline routes
+  [tool] Bash: Delete route and crash probe
+  [tool] Bash: Read baseline server log and confirm port freed
+  [tool] Bash: Get installed versions and enumerate routes
+  [tool] Write: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Write: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+```
+================================
+PHASE 1: PROJECT ANALYSIS
+================================
+Language:      JavaScript (Node.js v24.19.0, CommonJS)
+Framework:     Express 4.18.2 (pin `^4.18.2`; instalada 4.22.1)
+Dependencies:  express, sqlite3 (^5.1.6; instalada 5.1.7). Nenhuma declarada sem uso; exports mortos: `globalCache`, `totalRevenue` (src/utils.js:25)
+Domain:        LMS / cursos com checkout (users, courses, enrollments, payments, audit_logs)
+Architecture:  Monolítica — 3 arquivos, classe `AppManager` concentra rotas + SQL + regra de pagamento; segredos literais em src/utils.js
+Source files:  3 files analyzed (~180 linhas; 0 testes)
+DB tables:     users, courses, enrollments, payments, audit_logs (SQLite `:memory:`, driver cru)
+================================
+```
+
+Entry point `src/app.js`, start original `npm start`. Porta 3000 hardcoded em `src/utils.js:6`.
+3 rotas, nenhuma com auth: `POST /api/checkout`, `GET /api/admin/financial-report`, `DELETE /api/users/:id`.
+Baseline: `.refactor-arch/baseline.md` — 12 requisições. Servidor parado (morreu sozinho na req. 12, porta confirmada livre).
+
+Achados de runtime já registrados: processo derruba com `card` numérico (`cc.startsWith is not a function`), ordem do relatório financeiro é não determinística, número de cartão completo + `pk_live_...` no log.
+
+Fase 2 agora.
+  [tool] TodoWrite: 
+  [tool] Read: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+  [tool] Bash: Run AP-01..AP-07 detection greps
+  [tool] Bash: Run AP-01..AP-07 detection greps
+  [tool] Bash: Run AP-09..AP-26 detection greps
+  [tool] Bash: Deprecated APIs and remaining greps
+  [tool] Bash: Confirm exact line numbers
+  [tool] Bash: Check for sibling reports dir
+  [tool] Write: /private<tmp>/-Users-tallao-projetos-mba-ia-refactor-projects-skill/e2786da5-317c-4340-a94c-75a389bdcee8/scrat
+```
+================================
+ARCHITECTURE AUDIT REPORT
+================================
+Project: ecommerce-api-legacy
+Stack:   JavaScript (Node.js v24.19.0) + Express 4.18.2
+Files:   3 analyzed | ~180 lines of code
+
+## Summary
+CRITICAL: 6 | HIGH: 6 | MEDIUM: 5 | LOW: 4
+
+## Findings
+
+### [CRITICAL] Credenciais / segredos hardcoded (AP-01)
+File: src/utils.js:2-6
+File: src/AppManager.js:18, 68
+Description: O objeto `config` carrega segredos literais no código-fonte versionado: `dbUser: "admin_master"`, `dbPass: "senha_super_secreta_prod_123"`, `paymentGatewayKey: "pk_live_****"` (prefixo `pk_live_` indica chave de produção) e `smtpUser: "no-reply@fullcycle.com.br"`. O seed grava a senha literal `'123'` para o usuário Leonan (`AppManager.js:18`) e o checkout aplica a senha default literal `"123456"` quando `pwd` não é enviado (`AppManager.js:68`). Não há leitura de `process.env` em nenhum arquivo (`grep -n "process.env" src/*.js` → vazio).
+Impact: Qualquer pessoa com acesso ao repositório obtém a chave do gateway de pagamento e a senha do banco; não há como rotacionar sem alterar código, nem como ter valores diferentes por ambiente. baseline: a chave aparece em texto puro no log do servidor (`.refactor-arch/baseline-server.log`, 4 ocorrências de `pk_live_****`).
+Recommendation: Mover todos os valores para variáveis de ambiente lidas em um módulo `config/`, criar `.env.example` com valores fictícios, e gerar/ler a senha de seed de `SEED_USER_PASSWORD` (sem fallback literal). (playbook PB-01, PB-25)
+
+### [CRITICAL] God Class / God File (AP-03)
+File: src/AppManager.js:4-141
+Description: A classe `AppManager` concentra, num único arquivo de 141 linhas, cinco responsabilidades: abre a conexão do banco (`:memory:`, linha 7), cria o schema e o seed (`initDb`, linhas 10-23), registra as 3 rotas HTTP (`setupRoutes`, linhas 28, 80, 131), implementa a regra de negócio de pagamento e matrícula (linhas 43-75) e monta o relatório financeiro agregando dados em memória (linhas 80-129). Não existem camadas: nenhum diretório `models/`, `controllers/`, `services/`, `routes/` ou `config/`.
+Impact: Impossível testar a regra de pagamento sem subir Express e o banco; qualquer alteração de rota toca o mesmo arquivo que a persistência; não há ponto de extensão para novos domínios. É a causa raiz de AP-08, AP-09, AP-11 e AP-16.
+Recommendation: Dividir em `config/`, `models/` (acesso a dados por entidade), `services/` (checkout, relatório), `controllers/`, `routes/` e `middlewares/`, com um composition root no entry point. (playbook PB-03, PB-04)
+
+### [CRITICAL] Exposição de dados sensíveis (AP-04)
+File: src/AppManager.js:45
+Description: `console.log(`Processando cartão ${cc} na chave ${config.paymentGatewayKey}`)` escreve no stdout o número completo do cartão recebido do cliente (PAN) junto com a chave do gateway de pagamento, a cada tentativa de checkout.
+Impact: Violação direta de PCI-DSS (PAN em claro em log) somada ao vazamento da credencial do gateway. baseline: `.refactor-arch/baseline-server.log` contém `Processando cartão 4111********4444 na chave pk_live_****` — inclusive para a tentativa recusada (cartão `5111...`).
+Recommendation: Remover o PAN e a chave do log; se for necessário rastrear a transação, registrar apenas os 4 últimos dígitos e um identificador da cobrança, via logger com níveis. (playbook PB-06)
+
+### [CRITICAL] Hash de senha fraco / caseiro (AP-05)
+File: src/utils.js:17-23
+File: src/AppManager.js:18, 68
+Description: `badCrypto(pwd)` concatena 10.000 vezes os 2 primeiros caracteres do Base64 da senha e devolve os 10 primeiros caracteres do resultado (`utils.js:17-23`). Não é hash: é codificação reversível, sem salt, sem custo real e com espaço de saída minúsculo — o resultado depende apenas dos 2 primeiros caracteres do Base64, ou seja, praticamente só do 1º caractere da senha. O seed grava a senha em texto puro (`AppManager.js:18`: `'123'`), então a coluna `pass` mistura texto puro e pseudo-hash. Quando `pwd` não é enviado, a senha vira o literal `"123456"` (`AppManager.js:68`). Nenhuma lib de hash (`bcrypt`, `argon2`, `scrypt`, `pbkdf2`) está no `package.json`.
+Impact: Qualquer vazamento da tabela `users` equivale a vazamento das senhas em claro; colisões em massa (todas as senhas começando com a mesma letra geram o mesmo "hash") permitem login cruzado caso um fluxo de autenticação seja adicionado.
+Recommendation: Substituir `badCrypto` por `crypto.scrypt` (stdlib do Node, sem nova dependência) com salt aleatório por usuário e formato `salt:hash`; eliminar a senha default e exigir `pwd` na validação de entrada. (playbook PB-05)
+
+### [CRITICAL] Endpoints administrativos/destrutivos sem autenticação (AP-06)
+File: src/AppManager.js:80, 131
+Description: `GET /api/admin/financial-report` (linha 80) devolve a receita por curso e a lista de alunos pagantes, e `DELETE /api/users/:id` (linha 131) remove usuários — ambas acessíveis anonimamente. Não há nenhum middleware ou verificação de credencial no projeto (`grep -nE "authenticate|verifyToken|requireAdmin|passport|Authorization|req.headers" src/*.js` → vazio). O relatório ainda expõe PII (nome do aluno, `SELECT name, email`, linha 104) e valores pagos a qualquer cliente anônimo (AP-25, registrado aqui para não duplicar).
+Impact: Faturamento completo da plataforma e a base de alunos pagantes ficam públicos; qualquer um apaga contas de usuário com uma requisição. baseline: requisições 1, 7, 9 e 10 — todas 200 sem credencial alguma.
+Recommendation: Manter as rotas e os paths, exigindo um header de administrador (`X-Admin-Token`, valor vindo do env) via middleware `requireAdmin` aplicado a `/api/admin/*` e ao DELETE; responder 401 sem o header. (playbook PB-07, PB-22)
+
+### [CRITICAL] Porta fixa no código / bind em todas as interfaces (AP-07)
+File: src/utils.js:6
+File: src/app.js:12
+Description: A porta é o literal `3000` dentro do objeto de config (`utils.js:6`) e `app.listen(config.port)` (`app.js:12`) é chamado sem host, o que faz o Express escutar em todas as interfaces (`::`/`0.0.0.0`). Não há leitura de `process.env.PORT` nem de `HOST` em nenhum arquivo.
+Impact: A aplicação não sobe em ambientes onde 3000 está ocupado sem editar código — confirmado no baseline: a porta 3000 estava em uso e foi necessário um wrapper para subir em 3001. Em ambiente compartilhado, a API administrativa sem auth (AP-06) fica exposta na rede.
+Recommendation: Ler porta e host de variáveis de ambiente (`PORT`, `HOST`, default `127.0.0.1` em desenvolvimento) no módulo de config, mantendo `npm start` funcionando. (playbook PB-01, PB-16)
+
+### [HIGH] Regra de negócio dentro das rotas (AP-08)
+File: src/AppManager.js:28-78, 80-129, 131-137
+Description: O handler de `POST /api/checkout` (51 linhas) decide a aprovação do pagamento (`cc.startsWith("4")`, linha 46), cria usuário com hash (linhas 68-72), insere matrícula, pagamento e log de auditoria (linhas 50, 54, 57) e serializa a resposta — tudo inline. O handler do relatório (linhas 80-129, 50 linhas) executa as queries, soma a receita e monta o payload. O handler de DELETE executa SQL direto (linha 133). Não existe nenhuma camada de serviço no projeto.
+Impact: A regra de aprovação de pagamento e o cálculo de receita só podem ser exercitados por HTTP; não há reuso possível (ex.: um job de reprocessamento) e cada mudança de regra arrisca quebrar o contrato HTTP.
+Recommendation: Extrair `CheckoutService` (criação de usuário, autorização do pagamento, matrícula, auditoria) e `ReportService` (receita por curso), deixando os controllers apenas traduzindo HTTP ↔ serviço. (playbook PB-04)
+
+### [HIGH] Estado global mutável / conexão sem injeção de dependência (AP-09)
+File: src/utils.js:9-10, 14, 25
+File: src/AppManager.js:2, 7
+Description: `globalCache` e `totalRevenue` são variáveis de módulo mutáveis e exportadas (`utils.js:9-10, 25`). `logAndCache` escreve em `globalCache` (linha 14) sem qualquer limite de tamanho ou expiração, e nada nunca lê esse cache. `totalRevenue` é exportado por valor (cópia de número), importado em `AppManager.js:2` e nunca usado — é impossível que funcione como acumulador. A conexão SQLite é criada dentro do construtor de `AppManager` (`AppManager.js:7`), não injetada.
+Impact: Vazamento de memória não limitado pelo cache (cresce com cada checkout); impossível substituir o banco por um dublê em teste, pois a classe instancia sua própria dependência; o acumulador exportado é uma armadilha para quem tentar usá-lo.
+Recommendation: Remover o cache e o acumulador globais; receber a conexão por injeção no construtor dos models/serviços e criá-la uma única vez no composition root. (playbook PB-17)
+
+### [HIGH] Escritas multi-etapa sem transação (AP-10)
+File: src/AppManager.js:50, 54, 57, 69
+Description: O checkout executa até quatro escritas encadeadas — `INSERT INTO users` (linha 69, quando o usuário não existe), `INSERT INTO enrollments` (linha 50), `INSERT INTO payments` (linha 54) e `INSERT INTO audit_logs` (linha 57) — sem `BEGIN`/`COMMIT`/`ROLLBACK`. `grep -nE "BEGIN|COMMIT|ROLLBACK" src/*.js` não retorna nada; o único `db.serialize` (linha 11) apenas serializa a execução do seed, não é transação.
+Impact: Falha em qualquer etapa intermediária deixa dados parciais permanentes: matrícula sem pagamento registrado (erro na linha 54 responde 500 depois de a matrícula já estar gravada), ou usuário criado sem matrícula nenhuma. O erro do INSERT de auditoria (linha 57) sequer é inspecionado — a resposta é "Sucesso" mesmo que a auditoria falhe.
+Recommendation: Envolver o fluxo em `BEGIN IMMEDIATE` / `COMMIT` com `ROLLBACK` no erro, dentro do serviço de checkout, usando um wrapper com Promise. (playbook PB-09)
+
+### [HIGH] Sem módulo de config / app factory; efeitos colaterais no import (AP-11)
+File: src/app.js:5-14
+File: src/utils.js:1-7
+Description: `src/app.js` cria o app, instancia `AppManager`, cria schema e seed (`manager.initDb()`, linha 9), registra rotas e chama `app.listen` (linha 12) — tudo em nível de módulo. Qualquer `require('./app')` sobe um servidor e recria o banco. Não existe `config/` nem leitura de ambiente: o objeto `config` em `utils.js:1-7` é um literal fixo, misturado com funções utilitárias no mesmo arquivo.
+Impact: Impossível criar uma instância da aplicação com outra configuração (teste, staging) ou importar a app sem efeitos colaterais; o seed sempre roda, mesmo em contexto onde não deveria.
+Recommendation: Criar `config/` lendo o ambiente e uma app factory (`createApp(deps)`) que apenas monta middlewares e rotas; deixar `listen` e a inicialização do banco somente no entry point (composition root). (playbook PB-01, PB-16)
+
+### [HIGH] Erros engolidos e ausência de error handler central (AP-12)
+File: src/AppManager.js:57, 92, 104, 106, 133
+File: src/app.js:5-14
+Description: Vários callbacks recebem `err` e nunca o inspecionam: auditoria (linha 57), listagem de matrículas (linha 92), busca de usuário (linha 104), busca de pagamento (linha 106) e o DELETE (linha 133, onde `err` é declarado e ignorado). Não há error handler central nem catch-all de rota (`grep -nE "app.use\(\s*\(err|app.use\(\s*\(\s*req\s*,\s*res" src/*.js` → vazio): os erros de negócio saem como `res.send(string)` em `text/html` numa API JSON. Uma exceção lançada dentro de um callback assíncrono do sqlite3 não é capturada por nada e derruba o processo.
+Impact: baseline req. 12 — `POST /api/checkout` com `card` numérico produziu `TypeError: cc.startsWith is not a function` em `AppManager.js:46` e **matou o processo Node**; como o banco é `:memory:`, todos os dados foram perdidos e o serviço ficou indisponível (requisições seguintes retornaram HTTP 000). baseline req. 8 — `GET /__rota-inexistente__` devolve a página HTML padrão do Express (`Cannot GET ...`, `Content-Type: text/html`) em vez do formato da API.
+Recommendation: Introduzir exceções de domínio + middleware de erro central registrado **depois** das rotas, um catch-all 404 no formato da API, e um wrapper async que encaminha rejeições para `next(err)`. (playbook PB-08, PB-23)
+
+### [HIGH] Integridade referencial ausente / órfãos após deleção (AP-19)
+File: src/AppManager.js:12-16
+File: src/AppManager.js:131-137
+Description: Nenhuma das cinco tabelas declara `FOREIGN KEY`, `REFERENCES`, `UNIQUE` ou `NOT NULL` (`grep -ciE "foreign key|references|unique|not null" src/AppManager.js` → 0), e não há `PRAGMA foreign_keys = ON`. `DELETE FROM users WHERE id = ?` (linha 133) não trata `enrollments` nem `payments`, e nada impede dois usuários com o mesmo e-mail — o próprio checkout busca o usuário por e-mail (`AppManager.js:40`).
+Impact: baseline req. 9 + 11 — após `DELETE /api/users/1`, o relatório financeiro passou a exibir `student: "Unknown"` e continuou contabilizando R$ 997 + R$ 497 de receita para um usuário que não existe mais: o número financeiro reportado fica preso a registros órfãos.
+Recommendation: Declarar `FOREIGN KEY ... REFERENCES ... ON DELETE CASCADE`, `NOT NULL` nas colunas obrigatórias e `UNIQUE` em `users.email`; habilitar `PRAGMA foreign_keys = ON` na conexão. (playbook PB-20)
+
+### [MEDIUM] Queries N+1 / agregação em memória (AP-13)
+File: src/AppManager.js:83, 92, 102-106
+Description: O relatório executa 1 query para listar cursos (linha 83), + 1 query de matrículas por curso (linha 92, dentro do `forEach` da linha 89) e, para cada matrícula (`forEach` linha 102), + 2 queries — usuário (linha 104) e pagamento (linha 106). Com C cursos e E matrículas, são `1 + C + 2E` queries. A soma da receita é feita em memória (linha 109) e a sincronização usa contadores manuais (`coursesPending--`, `enrPending--`, linhas 97, 117, 120).
+Impact: O custo cresce linearmente com a base de alunos; além disso, os contadores manuais tornam a ordem do array de saída não determinística — baseline: as requisições 1 e 7 devolveram `Docker` primeiro, a requisição 11 devolveu `Clean Architecture` primeiro, para os mesmos dados lógicos.
+Recommendation: Substituir por uma única query com `JOIN` + `GROUP BY` (ou duas queries e agrupamento em memória), ordenada por `courses.id` para resultado estável. (playbook PB-10)
+
+### [MEDIUM] Validação de entrada ausente (AP-14)
+File: src/AppManager.js:29-35, 46, 132
+Description: Os cinco campos do checkout são lidos direto de `req.body` (linhas 29-33) e a única checagem é de presença/verdade (`if (!u || !e || !cid || !cc)`, linha 35) — que nem inclui `pwd`. Não há validação de tipo, de formato de e-mail, nem de `c_id` numérico. `cc.startsWith("4")` (linha 46) assume string sem verificar. `req.params.id` (linha 132) vai direto para o SQL sem conversão nem checagem de inteiro. Nenhuma biblioteca de validação está declarada.
+Impact: Um `card` numérico derruba o processo (ver AP-12, baseline req. 12, severidade registrada lá); `c_id` fora de faixa, e-mail inválido ou `id` não numérico passam sem erro de validação — o DELETE com id inexistente responde 200.
+Recommendation: Validar presença, tipo e formato de cada campo na borda (validador próprio em `middlewares/` ou nos controllers), respondendo 400 com o mesmo corpo atual (`Bad Request`) para manter o contrato. (playbook PB-11)
+
+### [MEDIUM] Callback hell (AP-16)
+File: src/AppManager.js:26, 37-77, 83-128
+Description: O checkout tem 5 níveis de callbacks aninhados (linhas 37 → 40 → 50 → 54 → 57) e o relatório tem 4 (linhas 83 → 92 → 102 → 104 → 106). `const self = this` (linha 26) existe porque os callbacks `function(err)` das linhas 50, 54 e 69 precisam que `this` seja o `Statement` do sqlite3 para ler `this.lastID` (linhas 52, 71) — o que impede usar arrow functions ali e força a referência manual.
+Impact: Fluxo difícil de ler e de alterar, propagação de erro manual em cada nível, e impossibilidade de usar `try/catch`; é o que torna o crash de AP-12 possível.
+Recommendation: Criar um wrapper com Promise para `run/get/all` (preservando `lastID` no retorno de `run`) e reescrever os fluxos com `async/await`. (playbook PB-12)
+
+### [MEDIUM] Deprecated APIs (AP-17)
+File: src/AppManager.js:37, 40, 50, 54, 57, 69, 83, 92, 104, 106, 133 — API de callback do `sqlite3` (`db.run/get/all(sql, params, cb)`) → wrapper com Promise (`util.promisify` ou funções `run/get/all` async)
+Description: Todo o acesso ao banco usa o estilo de callback do driver `sqlite3`, hoje desencorajado em favor de interfaces baseadas em Promise. Os demais greps da tabela de APIs deprecated do catálogo não retornaram nada: `new Buffer(`, `createCipher/createDecipher`, `url.parse(`, `body-parser`, `var `, `fs.exists(`, `req.param(`, `res.send(status, body)`, `res.sendfile(`, `app.del(`, `require('querystring')`, `util.isX`, `createHash('md5'/'sha1')`.
+Impact: Impede `async/await` e `try/catch`, obriga a propagação manual de erro e sustenta o callback hell (AP-16) e os erros engolidos (AP-12).
+Recommendation: Encapsular o driver num pequeno módulo com Promise na camada de dados; manter a dependência `sqlite3` já instalada. (playbook PB-13)
+
+### [MEDIUM] Mensagem de resposta que contradiz o comportamento real (AP-26)
+File: src/AppManager.js:135
+Description: O DELETE responde `"Usuário deletado, mas as matrículas e pagamentos ficaram sujos no banco."` — a mensagem é enviada em qualquer caso, inclusive quando `err` ocorreu (nunca inspecionado, linha 133) e quando nenhum registro foi afetado. baseline req. 10: `DELETE /api/users/9999` (id inexistente) devolveu 200 com essa mesma mensagem de sucesso.
+Impact: Induz o operador a acreditar que uma exclusão ocorreu quando nada aconteceu, e normaliza a corrupção de dados descrita em AP-19 como se fosse comportamento aceito.
+Recommendation: Corrigir a integridade (PB-20) e então ajustar a mensagem para descrever o efeito real, checando `this.changes` para distinguir 404 de sucesso — mantendo 200 e corpo de texto para o caso de sucesso, para preservar o contrato. (playbook PB-24)
+
+### [LOW] Magic numbers / strings (AP-20)
+File: src/AppManager.js:46, 48, 108
+File: src/utils.js:6, 19, 20, 22
+Description: Literais de domínio sem nome espalhados pelo código: o prefixo `"4"` que decide a aprovação do cartão e os status `"PAID"`/`"DENIED"` (linhas 46, 48, 108, repetidos), a porta `3000` (`utils.js:6`), o número de iterações `10000` e os cortes `substring(0, 2)` / `substring(0, 10)` do pseudo-hash (`utils.js:19, 20, 22`).
+Impact: Mudança de regra exige caçar literais repetidos em arquivos diferentes; a chance de divergência entre o valor gravado e o valor comparado é real (`"PAID"` aparece com aspas duplas na linha 46 e simples na linha 108).
+Recommendation: Centralizar em constantes nomeadas (`PAYMENT_STATUS.PAID`, `APPROVED_CARD_PREFIX`) e levar a porta para o módulo de config. (playbook PB-14)
+
+### [LOW] Nomenclatura ruim / sombreamento (AP-21)
+File: src/AppManager.js:4, 29-33, 132
+Description: Variáveis de uma letra ou crípticas no handler de checkout: `u`, `e`, `p`, `cid`, `cc` (linhas 29-33) — `e` é especialmente perigoso por ser a convenção usual de "erro". `let id` (linha 132) sombreia o nome do parâmetro de rota. A classe `AppManager` (linha 4) tem nome genérico que não descreve domínio algum. Os campos do contrato HTTP (`usr`, `eml`, `pwd`, `c_id`, `card`) também são crípticos — registrados aqui, mas **não devem ser renomeados**, pois fazem parte do contrato público (ver `api.http`).
+Impact: Leitura e manutenção prejudicadas; risco de confundir `e` (e-mail) com `err`.
+Recommendation: Renomear as variáveis internas (`name`, `email`, `password`, `courseId`, `card`) e substituir `AppManager` pelas classes de domínio criadas no split, preservando os nomes dos campos JSON de entrada/saída. (playbook PB-18)
+
+### [LOW] `console.log` como logging (AP-22)
+File: src/app.js:13
+File: src/AppManager.js:45
+File: src/utils.js:13
+Description: Todo o logging da aplicação são três `console.log` sem nível, sem timestamp e sem contexto de requisição — banner de boot (`app.js:13`), log do checkout com dados sensíveis (`AppManager.js:45`, ver AP-04) e log do cache (`utils.js:13`).
+Impact: Não há como filtrar por severidade nem desligar logs verbosos em produção; o log de cache polui a saída a cada checkout bem-sucedido.
+Recommendation: Introduzir um logger mínimo com níveis (`info`/`warn`/`error`) em `utils/` ou `middlewares/`, e remover o log de cache junto com o cache. (playbook PB-15)
+
+### [LOW] Código morto / exports nunca usados (AP-23)
+File: src/utils.js:2-3, 5, 9-10, 12-15, 25
+File: src/AppManager.js:2
+Description: `totalRevenue` é importado em `AppManager.js:2` e nunca lido; é exportado por valor (`utils.js:25`), então nem poderia acumular nada. `globalCache` é exportado (linha 25) e escrito por `logAndCache` (linha 14), mas nunca lido por ninguém — a função e o cache inteiro são código morto que só gasta memória. As chaves de config `dbUser`, `dbPass` (linhas 2-3) e `smtpUser` (linha 5) não são usadas em lugar nenhum: o projeto usa SQLite em memória e não envia e-mail. Nenhuma dependência declarada no `package.json` está sem uso.
+Impact: O leitor é levado a acreditar que existe um banco externo, um envio de e-mail e um acumulador de receita que não existem; o cache cresce indefinidamente sem servir a nada.
+Recommendation: Remover `globalCache`, `logAndCache`, `totalRevenue` e as chaves de config não utilizadas junto com a dissolução de `utils.js` no split. (playbook PB-18)
+
+Verificados sem ocorrência: SQL Injection (AP-02 — todas as queries usam placeholders `?`; o único template literal, `AppManager.js:57`, monta a *mensagem* de auditoria passada como parâmetro vinculado); token de autenticação previsível (AP-24 — o projeto não tem login nem emissão de token); CORS aberto (AP-18 — nenhum `cors()` ou `origin: '*'`; o único `app.use` é `express.json()`, `app.js:6` — a ausência de camada de middleware está registrada em AP-06 e AP-12); duplicação de código relevante (AP-15 — `processPaymentAndEnroll` é reutilizado nos dois caminhos; só os textos de erro 500 se repetem); PII sem auth (AP-25 — ocorre em `/api/admin/financial-report`, registrado em AP-06 para não duplicar).
+
+================================
+Total: 21 findings
+================================
+```
+
+Relatório salvo em `.refactor-arch/audit-report.md`. Não existe `../reports/` no repositório, então nada foi copiado.
+
+```
+Phase 2 complete. Proceed with refactoring (Phase 3)? [y/n]
+```
+
+[result] subtype=success turns=36 duration_ms=587340
+
+--- git status --short (cópia do original após Fases 1-2) ---
+?? .refactor-arch/audit-report.md
+?? .refactor-arch/baseline-server.log
+?? .refactor-arch/baseline.md
+?? .refactor-arch/baseline.pid
+?? .refactor-arch/phase1-analysis.md

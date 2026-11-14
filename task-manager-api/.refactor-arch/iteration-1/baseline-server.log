@@ -1,0 +1,161 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5301
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [14/Nov/2026 10:13:01] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:06] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:06] "GET /health HTTP/1.1" 200 -
+<repo>/task-manager-api/routes/task_routes.py:31: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if t.due_date < datetime.utcnow():
+<repo>/task-manager-api/routes/task_routes.py:42: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  user = User.query.get(t.user_id)
+<repo>/task-manager-api/routes/task_routes.py:51: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  cat = Category.query.get(t.category_id)
+127.0.0.1 - - [14/Nov/2026 10:13:06] "GET /tasks HTTP/1.1" 200 -
+<repo>/task-manager-api/routes/task_routes.py:67: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  task = Task.query.get(task_id)
+<repo>/task-manager-api/routes/task_routes.py:72: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if task.due_date < datetime.utcnow():
+127.0.0.1 - - [14/Nov/2026 10:13:06] "GET /tasks/1 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:06] "[33mGET /tasks/999 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /tasks/search?q=API HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /tasks/search?status=pending&priority=1 HTTP/1.1" 200 -
+[2026-11-14 10:13:11,299] ERROR in app: Exception on /tasks/search [GET]
+Traceback (most recent call last):
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/routes/task_routes.py", line 261, in search_tasks
+    tasks = tasks.filter(Task.priority == int(priority))
+                                          ~~~^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'abc'
+127.0.0.1 - - [14/Nov/2026 10:13:11] "[35m[1mGET /tasks/search?priority=abc HTTP/1.1[0m" 500 -
+<repo>/task-manager-api/routes/task_routes.py:285: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if t.due_date < datetime.utcnow():
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /tasks/stats HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /users HTTP/1.1" 200 -
+<repo>/task-manager-api/routes/user_routes.py:29: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  user = User.query.get(user_id)
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /users/1 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:11] "[33mGET /users/999 HTTP/1.1[0m" 404 -
+<repo>/task-manager-api/routes/user_routes.py:155: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  user = User.query.get(user_id)
+<repo>/task-manager-api/routes/user_routes.py:172: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if t.due_date < datetime.utcnow():
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /users/1/tasks HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:11] "[33mGET /users/999/tasks HTTP/1.1[0m" 404 -
+<repo>/task-manager-api/routes/report_routes.py:35: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if t.due_date < datetime.utcnow():
+<repo>/task-manager-api/routes/report_routes.py:42: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  'days_overdue': (datetime.utcnow() - t.due_date).days
+<repo>/task-manager-api/routes/report_routes.py:45: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  seven_days_ago = datetime.utcnow() - timedelta(days=7)
+<repo>/task-manager-api/routes/report_routes.py:71: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  'generated_at': str(datetime.utcnow()),
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /reports/summary HTTP/1.1" 200 -
+<repo>/task-manager-api/routes/report_routes.py:105: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  user = User.query.get(user_id)
+<repo>/task-manager-api/routes/report_routes.py:133: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if t.due_date < datetime.utcnow():
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /reports/user/1 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:11] "[33mGET /reports/user/999 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /categories HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:11] "GET /tasks HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "POST /login HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[31m[1mPOST /login HTTP/1.1[0m" 401 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[31m[1mPOST /login HTTP/1.1[0m" 400 -
+<repo>/task-manager-api/routes/task_routes.py:117: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  user = User.query.get(user_id)
+<repo>/task-manager-api/routes/task_routes.py:122: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  cat = Category.query.get(category_id)
+<repo>/task-manager-api/.venv/lib/python3.14/site-packages/sqlalchemy/sql/schema.py:4362: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore[call-arg, no-any-return, no-untyped-call]  # noqa: E501
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[35m[1mPOST /tasks HTTP/1.1[0m" 201 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[31m[1mPOST /tasks HTTP/1.1[0m" 400 -
+[2026-11-14 10:13:19,532] ERROR in app: Exception on /tasks [POST]
+Traceback (most recent call last):
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/routes/task_routes.py", line 113, in create_task
+    if priority < 1 or priority > 5:
+       ^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'str' and 'int'
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[35m[1mPOST /tasks HTTP/1.1[0m" 500 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[33mPOST /tasks HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[35m[1mPOST /users HTTP/1.1[0m" 201 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[31m[1mPOST /users HTTP/1.1[0m" 409 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[31m[1mPOST /users HTTP/1.1[0m" 400 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[35m[1mPOST /categories HTTP/1.1[0m" 201 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[31m[1mPOST /categories HTTP/1.1[0m" 400 -
+<repo>/task-manager-api/routes/task_routes.py:158: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  task = Task.query.get(task_id)
+<repo>/task-manager-api/routes/task_routes.py:215: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  task.updated_at = datetime.utcnow()
+127.0.0.1 - - [14/Nov/2026 10:13:19] "PUT /tasks/11 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[31m[1mPUT /tasks/11 HTTP/1.1[0m" 400 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[33mPUT /tasks/999 HTTP/1.1[0m" 404 -
+<repo>/task-manager-api/routes/user_routes.py:94: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  user = User.query.get(user_id)
+127.0.0.1 - - [14/Nov/2026 10:13:19] "PUT /users/4 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[31m[1mPUT /users/4 HTTP/1.1[0m" 400 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[33mPUT /users/999 HTTP/1.1[0m" 404 -
+<repo>/task-manager-api/routes/report_routes.py:192: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  cat = Category.query.get(cat_id)
+127.0.0.1 - - [14/Nov/2026 10:13:19] "PUT /categories/5 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[33mPUT /categories/999 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Nov/2026 10:13:19] "[31m[1mPUT /categories/5 HTTP/1.1[0m" 415 -
+[2026-11-14 10:13:29,322] ERROR in app: Exception on /categories/5 [PUT]
+Traceback (most recent call last):
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ~^^^^^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "<repo>/task-manager-api/.venv/lib/python3.14/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "<repo>/task-manager-api/routes/report_routes.py", line 197, in update_category
+    if 'name' in data:
+       ^^^^^^^^^^^^^^
+TypeError: argument of type 'NoneType' is not a container or iterable
+127.0.0.1 - - [14/Nov/2026 10:13:29] "[35m[1mPUT /categories/5 HTTP/1.1[0m" 500 -
+127.0.0.1 - - [14/Nov/2026 10:13:29] "[35m[1mPOST /tasks HTTP/1.1[0m" 201 -
+<repo>/task-manager-api/routes/task_routes.py:227: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  task = Task.query.get(task_id)
+127.0.0.1 - - [14/Nov/2026 10:13:29] "DELETE /tasks/11 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:29] "[33mDELETE /tasks/999 HTTP/1.1[0m" 404 -
+<repo>/task-manager-api/routes/user_routes.py:136: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  user = User.query.get(user_id)
+127.0.0.1 - - [14/Nov/2026 10:13:29] "DELETE /users/4 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:29] "[33mGET /tasks/12 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Nov/2026 10:13:29] "[33mDELETE /users/999 HTTP/1.1[0m" 404 -
+<repo>/task-manager-api/routes/report_routes.py:213: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  cat = Category.query.get(cat_id)
+127.0.0.1 - - [14/Nov/2026 10:13:29] "DELETE /categories/5 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:29] "[33mDELETE /categories/999 HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Nov/2026 10:13:29] "DELETE /categories/4 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Nov/2026 10:13:29] "GET /tasks/4 HTTP/1.1" 200 -

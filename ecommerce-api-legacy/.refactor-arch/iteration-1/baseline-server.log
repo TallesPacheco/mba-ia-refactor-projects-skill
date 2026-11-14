@@ -1,0 +1,40 @@
+Frankenstein LMS rodando na porta 3101...
+Processando cartão ****REDACTED**** na chave pk_live_****REDACTED****
+Processando cartão ****REDACTED**** na chave pk_live_****REDACTED****
+[LOG] Salvando no cache: last_checkout_3
+Processando cartão ****REDACTED**** na chave pk_live_****REDACTED****
+[LOG] Salvando no cache: last_checkout_1
+SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+    at JSON.parse (<anonymous>)
+    at parse (<repo>/ecommerce-api-legacy/node_modules/body-parser/lib/types/json.js:92:19)
+    at <repo>/ecommerce-api-legacy/node_modules/body-parser/lib/read.js:128:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+    at invokeCallback (<repo>/ecommerce-api-legacy/node_modules/raw-body/index.js:238:16)
+    at done (<repo>/ecommerce-api-legacy/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (<repo>/ecommerce-api-legacy/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:509:28)
+    at endReadableNT (node:internal/streams/readable:1736:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+Processando cartão ****REDACTED**** na chave pk_live_****REDACTED****
+<repo>/ecommerce-api-legacy/src/AppManager.js:46
+                        let status = cc.startsWith("4") ? "PAID" : "DENIED";
+                                        ^
+
+TypeError: cc.startsWith is not a function
+    at processPaymentAndEnroll (<repo>/ecommerce-api-legacy/src/AppManager.js:46:41)
+    at Statement.<anonymous> (<repo>/ecommerce-api-legacy/src/AppManager.js:71:29)
+    at Statement.replacement (<repo>/ecommerce-api-legacy/node_modules/sqlite3/lib/trace.js:25:27)
+
+Node.js v24.19.0
+Frankenstein LMS rodando na porta 3101...
+SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+    at JSON.parse (<anonymous>)
+    at parse (<repo>/ecommerce-api-legacy/node_modules/body-parser/lib/types/json.js:92:19)
+    at <repo>/ecommerce-api-legacy/node_modules/body-parser/lib/read.js:128:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+    at invokeCallback (<repo>/ecommerce-api-legacy/node_modules/raw-body/index.js:238:16)
+    at done (<repo>/ecommerce-api-legacy/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (<repo>/ecommerce-api-legacy/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:509:28)
+    at endReadableNT (node:internal/streams/readable:1736:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)

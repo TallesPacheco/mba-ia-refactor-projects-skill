@@ -1,4 +1,7 @@
 @baseUrl = http://localhost:3000
+# Valor de ADMIN_TOKEN. Sem a variável no ambiente, o app gera um token por boot
+# e o imprime no log (linha "ADMIN_TOKEN não definido; token gerado...").
+@adminToken = troque-este-valor-apenas-desenvolvimento
 
 ### Checkout - sucesso
 POST {{baseUrl}}/api/checkout
@@ -26,6 +29,8 @@ Content-Type: application/json
 
 ### Relatório financeiro administrativo
 GET {{baseUrl}}/api/admin/financial-report
+X-Admin-Token: {{adminToken}}
 
 ### Deletar usuário
 DELETE {{baseUrl}}/api/users/1
+X-Admin-Token: {{adminToken}}

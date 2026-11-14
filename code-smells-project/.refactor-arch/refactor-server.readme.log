@@ -1,0 +1,16 @@
+2026-11-14 11:31:26,584 WARNING __main__: ADMIN_TOKEN padrão de desenvolvimento em uso; defina ADMIN_TOKEN fora de dev
+2026-11-14 11:31:26,706 INFO __main__: Servidor iniciado em http://127.0.0.1:5303
+ * Serving Flask app 'app'
+ * Debug mode: off
+2026-11-14 11:31:26,710 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5303
+2026-11-14 11:31:26,710 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-11-14 11:31:29,502 INFO services.usuario_service: Login bem-sucedido usuario_id=1
+2026-11-14 11:31:29,503 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:31:29] "POST /login HTTP/1.1" 200 -
+2026-11-14 11:31:29,512 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:31:29] "GET /usuarios/1 HTTP/1.1" 200 -
+2026-11-14 11:31:29,522 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:31:29] "GET /usuarios HTTP/1.1" 200 -
+2026-11-14 11:31:29,566 INFO services.usuario_service: Login bem-sucedido usuario_id=2
+2026-11-14 11:31:29,567 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:31:29] "POST /login HTTP/1.1" 200 -
+2026-11-14 11:31:29,575 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:31:29] "[31m[1mGET /pedidos/usuario/1 HTTP/1.1[0m" 403 -
+2026-11-14 11:31:29,619 INFO services.usuario_service: Usuário criado usuario_id=4
+2026-11-14 11:31:29,620 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 11:31:29] "[35m[1mPOST /usuarios HTTP/1.1[0m" 201 -

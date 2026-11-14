@@ -10,3 +10,7 @@ venv/
 # SQLite
 *.db
 instance/
+
+# OS / runtime
+.DS_Store
+*.pid

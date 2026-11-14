@@ -1,0 +1,95 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+2026-11-14 10:23:28,368 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5302
+2026-11-14 10:23:28,369 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-11-14 10:23:28,666 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:28] "GET / HTTP/1.1" 200 -
+2026-11-14 10:23:49,266 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET / HTTP/1.1" 200 -
+2026-11-14 10:23:49,267 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /health HTTP/1.1" 200 -
+2026-11-14 10:23:49,292 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /tasks HTTP/1.1" 200 -
+2026-11-14 10:23:49,294 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /tasks/1 HTTP/1.1" 200 -
+2026-11-14 10:23:49,296 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mGET /tasks/999 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,299 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /tasks/search?q=API HTTP/1.1" 200 -
+2026-11-14 10:23:49,300 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /tasks/search?status=pending&priority=1 HTTP/1.1" 200 -
+2026-11-14 10:23:49,301 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mGET /tasks/search?priority=abc HTTP/1.1[0m" 400 -
+2026-11-14 10:23:49,303 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /tasks/stats HTTP/1.1" 200 -
+2026-11-14 10:23:49,304 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /users HTTP/1.1" 200 -
+2026-11-14 10:23:49,305 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /users/1 HTTP/1.1" 200 -
+2026-11-14 10:23:49,306 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mGET /users/999 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,307 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /users/1/tasks HTTP/1.1" 200 -
+2026-11-14 10:23:49,307 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mGET /users/999/tasks HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,310 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /reports/summary HTTP/1.1" 200 -
+2026-11-14 10:23:49,311 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /reports/user/1 HTTP/1.1" 200 -
+2026-11-14 10:23:49,311 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mGET /reports/user/999 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,312 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /categories HTTP/1.1" 200 -
+2026-11-14 10:23:49,357 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "POST /login HTTP/1.1" 200 -
+2026-11-14 10:23:49,397 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPOST /login HTTP/1.1[0m" 401 -
+2026-11-14 10:23:49,398 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPOST /login HTTP/1.1[0m" 400 -
+2026-11-14 10:23:49,402 INFO services.task_service: Task criada id=11
+2026-11-14 10:23:49,402 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[35m[1mPOST /tasks HTTP/1.1[0m" 201 -
+2026-11-14 10:23:49,403 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPOST /tasks HTTP/1.1[0m" 400 -
+2026-11-14 10:23:49,403 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPOST /tasks HTTP/1.1[0m" 400 -
+2026-11-14 10:23:49,404 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mPOST /tasks HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,444 INFO services.user_service: Usuário criado id=4
+2026-11-14 10:23:49,444 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[35m[1mPOST /users HTTP/1.1[0m" 201 -
+2026-11-14 10:23:49,445 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPOST /users HTTP/1.1[0m" 409 -
+2026-11-14 10:23:49,445 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPOST /users HTTP/1.1[0m" 400 -
+2026-11-14 10:23:49,447 INFO services.category_service: Categoria criada id=5
+2026-11-14 10:23:49,447 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[35m[1mPOST /categories HTTP/1.1[0m" 201 -
+2026-11-14 10:23:49,447 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPOST /categories HTTP/1.1[0m" 400 -
+2026-11-14 10:23:49,448 INFO services.task_service: Task atualizada id=11
+2026-11-14 10:23:49,448 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "PUT /tasks/11 HTTP/1.1" 200 -
+2026-11-14 10:23:49,449 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPUT /tasks/11 HTTP/1.1[0m" 400 -
+2026-11-14 10:23:49,449 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mPUT /tasks/999 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,450 INFO services.user_service: Usuário atualizado id=4
+2026-11-14 10:23:49,450 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "PUT /users/4 HTTP/1.1" 200 -
+2026-11-14 10:23:49,451 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPUT /users/4 HTTP/1.1[0m" 400 -
+2026-11-14 10:23:49,451 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mPUT /users/999 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,452 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "PUT /categories/5 HTTP/1.1" 200 -
+2026-11-14 10:23:49,453 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mPUT /categories/999 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,453 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPUT /categories/5 HTTP/1.1[0m" 415 -
+2026-11-14 10:23:49,454 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[31m[1mPUT /categories/5 HTTP/1.1[0m" 400 -
+2026-11-14 10:23:49,455 INFO services.task_service: Task criada id=12
+2026-11-14 10:23:49,455 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[35m[1mPOST /tasks HTTP/1.1[0m" 201 -
+2026-11-14 10:23:49,456 INFO services.task_service: Task deletada id=11
+2026-11-14 10:23:49,456 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "DELETE /tasks/11 HTTP/1.1" 200 -
+2026-11-14 10:23:49,456 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mDELETE /tasks/999 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,457 INFO services.user_service: Usuário deletado id=4
+2026-11-14 10:23:49,458 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "DELETE /users/4 HTTP/1.1" 200 -
+2026-11-14 10:23:49,458 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mGET /tasks/12 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,458 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mDELETE /users/999 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,459 INFO services.category_service: Categoria deletada id=5
+2026-11-14 10:23:49,460 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "DELETE /categories/5 HTTP/1.1" 200 -
+2026-11-14 10:23:49,460 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "[33mDELETE /categories/999 HTTP/1.1[0m" 404 -
+2026-11-14 10:23:49,461 INFO services.category_service: Categoria deletada id=4
+2026-11-14 10:23:49,461 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "DELETE /categories/4 HTTP/1.1" 200 -
+2026-11-14 10:23:49,462 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:23:49] "GET /tasks/4 HTTP/1.1" 200 -
+2026-11-14 10:24:01,288 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "GET /tasks/stats HTTP/1.1" 200 -
+2026-11-14 10:24:01,304 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "GET /reports/summary HTTP/1.1" 200 -
+2026-11-14 10:24:01,319 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "GET /reports/user/1 HTTP/1.1" 200 -
+2026-11-14 10:24:01,329 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "GET /tasks/search?q=API HTTP/1.1" 200 -
+2026-11-14 10:24:01,344 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "GET /tasks/search?status=pending&priority=1 HTTP/1.1" 200 -
+2026-11-14 10:24:01,359 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "GET /users HTTP/1.1" 200 -
+2026-11-14 10:24:01,369 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "GET /categories HTTP/1.1" 200 -
+2026-11-14 10:24:01,384 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "GET /tasks/1 HTTP/1.1" 200 -
+2026-11-14 10:24:01,393 ERROR werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] code 400, message Bad request syntax ('DELETE /tasks/1 / HTTP/1.1')
+2026-11-14 10:24:01,393 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "[31m[1mDELETE /tasks/1 / HTTP/1.1[0m" 400 -
+2026-11-14 10:24:01,403 ERROR werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] code 400, message Bad request syntax ('DELETE /users/1 / HTTP/1.1')
+2026-11-14 10:24:01,403 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "[31m[1mDELETE /users/1 / HTTP/1.1[0m" 400 -
+2026-11-14 10:24:01,412 ERROR werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] code 400, message Bad request syntax ('DELETE /categories/1 / HTTP/1.1')
+2026-11-14 10:24:01,412 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "[31m[1mDELETE /categories/1 / HTTP/1.1[0m" 400 -
+2026-11-14 10:24:01,422 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "[31m[1mDELETE /tasks/1 HTTP/1.1[0m" 401 -
+2026-11-14 10:24:01,429 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "[31m[1mPUT /users/2 HTTP/1.1[0m" 401 -
+2026-11-14 10:24:01,438 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "[31m[1mPOST /users HTTP/1.1[0m" 401 -
+2026-11-14 10:24:01,504 INFO services.user_service: Usuário criado id=4
+2026-11-14 10:24:01,504 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "[35m[1mPOST /users HTTP/1.1[0m" 201 -
+2026-11-14 10:24:01,516 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "[33mGET /nao-existe HTTP/1.1[0m" 404 -
+2026-11-14 10:24:01,527 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:01] "[31m[1mPOST /tasks HTTP/1.1[0m" 400 -
+2026-11-14 10:24:07,575 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:07] "[31m[1mDELETE /tasks/1 HTTP/1.1[0m" 401 -
+2026-11-14 10:24:07,585 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:07] "[31m[1mDELETE /users/1 HTTP/1.1[0m" 401 -
+2026-11-14 10:24:07,595 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:07] "[31m[1mDELETE /categories/1 HTTP/1.1[0m" 401 -
+2026-11-14 10:24:07,614 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:07] "GET /tasks/1 HTTP/1.1" 200 -
+2026-11-14 10:24:07,625 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:07] "[31m[1mPUT /users/2 HTTP/1.1[0m" 400 -
+2026-11-14 10:24:07,635 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:07] "[31m[1mPOST /tasks HTTP/1.1[0m" 400 -
+2026-11-14 10:24:07,646 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:07] "[31m[1mPOST /categories HTTP/1.1[0m" 400 -
+2026-11-14 10:24:07,657 INFO werkzeug: 127.0.0.1 - - [14/Nov/2026 10:24:07] "PUT /categories/2 HTTP/1.1" 200 -
